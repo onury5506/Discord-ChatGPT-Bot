@@ -39,6 +39,8 @@ async function initDiscordCommands(){
     }
 }
 
+
+
 async function main() {
 
     const chatGTP = await initChatGPT()
@@ -51,11 +53,28 @@ async function main() {
         console.log(`Logged in as ${client.user.tag}!`);
     });
 
+    function askQuestion(question,interaction){
+        let tmr = setTimeout(()=>{
+            interaction.editReply({content:"Oppss, something went wrong! (Timeout)"})
+        },45000)
+
+        chatGTP.sendMessage(question).then((response)=>{
+            clearTimeout(tmr)
+            interaction.editReply({content:response})
+        }).catch(()=>{
+            interaction.editReply({content:"Oppss, something went wrong! (Error)"})
+        })
+    }
+
     client.on("interactionCreate", async interaction => {
         const question = interaction.options.getString("question")
         interaction.reply({content:"let me think..."})
-        const response = await chatGTP.sendMessage(question).catch(console.error)
-        interaction.editReply({content:response})
+        try{
+            askQuestion(question,interaction)
+        }catch(e){
+            console.error(e)
+        }
+        
     });
     
     client.login(process.env.DISCORD_BOT_TOKEN);
