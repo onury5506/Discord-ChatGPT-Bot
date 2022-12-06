@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import { ChatGPTAPI } from 'chatgpt'
 import { Client, GatewayIntentBits, REST, Routes } from 'discord.js'
+import OPENAI_SESSION from './openai_session.js'
 
 dotenv.config()
 
@@ -20,11 +21,39 @@ const commands = [
 ];
 
 async function initChatGPT() {
-    const api = new ChatGPTAPI({ sessionToken: process.env.SESSION_TOKEN })
+    let sessionToken
+    while(true){
+        try{
+            sessionToken = await OPENAI_SESSION.getSession(process.env.OPENAI_EMAIL,process.env.OPENAI_PASSWORD)
+            break
+        }catch(e){
+            console.error("initChatGPT ERROR : "+e)
+        }
+    }
+
+    let api = new ChatGPTAPI({ sessionToken })
 
     await api.ensureAuth()
 
-    return api;
+    setInterval(async ()=>{
+        try{
+            let sessionToken = await OPENAI_SESSION.getSession(process.env.OPENAI_EMAIL,process.env.OPENAI_PASSWORD)
+            let new_api = new ChatGPTAPI({ sessionToken })
+
+            await new_api.ensureAuth()
+
+            api = new_api
+            console.log("Session Token Changed - ",new Date())
+        }catch(e){
+            console.error(e)
+        }
+    },600000)
+
+    return {
+        sendMessage:(message,opts={})=>{
+            return api.sendMessage(message,opts)
+        }
+    };
 }
 
 async function initDiscordCommands(){
@@ -51,6 +80,7 @@ async function main() {
 
     client.on('ready', () => {
         console.log(`Logged in as ${client.user.tag}!`);
+        console.log(new Date())
     });
 
     function askQuestion(question,interaction){
