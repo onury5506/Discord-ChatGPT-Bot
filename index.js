@@ -114,7 +114,7 @@ async function main() {
     }
 
     client.on("messageCreate", async message => {
-        if (message.channel.type != ChannelType.DM || message.author.bot) {
+        if (process.env.ENABLE_DIRECT_MESSAGES !== "true" || message.channel.type != ChannelType.DM || message.author.bot) {
             return;
         }
 
