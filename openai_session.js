@@ -34,6 +34,11 @@ const options = {
 }
 
 async function getSession(email, password) {
+
+    if(!email || !password){
+        throw "empty email or password!"
+    }
+    
     const browser = await puppeteer.launch(process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD ? options.docker : options.nodejs)
     const page = await browser.newPage()
     await page.setUserAgent(USER_AGENT)
