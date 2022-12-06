@@ -4,6 +4,7 @@ import { Client, GatewayIntentBits, REST, Routes, Partials, ChannelType } from '
 import OPENAI_SESSION from './openai_session.js'
 import { v4 as uuidv4 } from 'uuid';
 
+const MAX_RESPONSE_CHUNK_LENGTH = 1500
 dotenv.config()
 
 const commands = [
@@ -113,6 +114,14 @@ async function main() {
         })
     }
 
+    async function splitAndSendResponse(resp,user){
+        while(resp.length > 0){
+            let end = Math.min(MAX_RESPONSE_CHUNK_LENGTH,resp.length)
+            await user.send(resp.slice(0,end))
+            resp = resp.slice(end,resp.length)
+        }
+    }
+
     client.on("messageCreate", async message => {
         if (process.env.ENABLE_DIRECT_MESSAGES !== "true" || message.channel.type != ChannelType.DM || message.author.bot) {
             return;
@@ -127,9 +136,13 @@ async function main() {
         console.log("Message : "+message.content)
         console.log("--------------")
 
-        let sentMessage = await message.author.send("Hmm, let me think...")
+        let sentMessage = await user.send("Hmm, let me think...")
         askQuestion(message.content, (response) => {
-            sentMessage.edit(response)
+            if(response.length >= MAX_RESPONSE_CHUNK_LENGTH){
+                splitAndSendResponse(response,user)
+            }else{
+                sentMessage.edit(response)
+            }
         })
     })
 
@@ -138,7 +151,12 @@ async function main() {
         interaction.reply({ content: "let me think..." })
         try {
             askQuestion(question, (content) => {
-                interaction.editReply({ content })
+                if(content.length >= MAX_RESPONSE_CHUNK_LENGTH){
+                    interaction.editReply({ content:"The answer to this question is very long, so I will answer by dm." })
+                    splitAndSendResponse(content,interaction.user)
+                }else{
+                    interaction.editReply({ content })
+                }
             })
         } catch (e) {
             console.error(e)
