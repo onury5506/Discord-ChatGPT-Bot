@@ -8,6 +8,7 @@ You can ask anything with ```/ask 'question'``` command.
 
 Screenshot : 
 ![Screenshot_1](https://raw.githubusercontent.com/onury5506/Discord-ChatGPT-Bot/master/screen_shot/Screenshot_1.jpg)
+![Screenshot_2](https://raw.githubusercontent.com/onury5506/Discord-ChatGPT-Bot/master/screen_shot/Screenshot_2.jpg)
 
 ## How to run it?
 
