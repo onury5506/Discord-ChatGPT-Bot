@@ -9,8 +9,9 @@ const OPENAI_URLS = {
 const SELECTORS = {
     login_button_selector: "#__next > div > div > div.flex.flex-row.gap-3 > button:nth-child(1)",
     email_input_selector: "#username",
-    continue_button_selector: "body > main > section > div > div > div > form > div.cb519a6e5 > button",
-    password_input_selector: "#password"
+    button_login_id: "._button-login-id",
+    button_login_password: "._button-login-password",
+    password_input_selector: "#password",
 }
 
 function wait(t) {
@@ -45,26 +46,26 @@ async function getSession(email, password) {
 
     await page.goto(OPENAI_URLS.LOGIN)
     
-    await wait(200)
+    await wait(500)
     await page.waitForSelector(SELECTORS.login_button_selector)
     await page.click(SELECTORS.login_button_selector)
     
     await page.waitForNavigation({ waitUntil: 'networkidle2' }) // wait page load
-    await wait(200)
+    await wait(500)
     
     await page.type(SELECTORS.email_input_selector, email, { delay: 100 })
 
-    await page.waitForSelector(SELECTORS.continue_button_selector)
-    await page.click(SELECTORS.continue_button_selector)
+    await page.waitForSelector(SELECTORS.button_login_id)
+    await page.click(SELECTORS.button_login_id)
     
     await wait(500)
     
     await page.type(SELECTORS.password_input_selector, password, { delay: 100 })
-    await page.waitForSelector(SELECTORS.continue_button_selector)
-    await page.click(SELECTORS.continue_button_selector)
+    await page.waitForSelector(SELECTORS.button_login_password)
+    await page.click(SELECTORS.button_login_password)
 
     await page.waitForNavigation({ waitUntil: 'networkidle2' }) // wait page load
-    await wait(200)
+    await wait(1000)
 
     const cookies = await page.cookies()
     const session_cookie = cookies.filter((cookie)=>cookie.name=="__Secure-next-auth.session-token")[0]
