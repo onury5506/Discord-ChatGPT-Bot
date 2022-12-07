@@ -21,10 +21,10 @@ function wait(t) {
 
 const options = {
     nodejs : {
-        headless:false
+        headless:true
     },
     docker : {
-        headless: false,
+        headless: true,
         executablePath: '/usr/bin/chromium-browser',
         args: [
           '--no-sandbox',
