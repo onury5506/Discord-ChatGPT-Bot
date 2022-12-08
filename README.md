@@ -4,7 +4,7 @@ In this project I used [DiscordJs](https://github.com/discordjs/discord.js) and 
 
 You can ask anything with ```/ask 'question'``` command.
 
-**Now it can continue conversation on direct messages! :tada:**
+**Now it can continue conversation in direct messages! :tada:**
 
 You can restart conversation by sending "restart" message to bot.
 
