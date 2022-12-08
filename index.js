@@ -3,6 +3,7 @@ import { ChatGPTAPI } from 'chatgpt'
 import { Client, GatewayIntentBits, REST, Routes, Partials, ChannelType } from 'discord.js'
 import OPENAI_SESSION from './openai_session.js'
 import { v4 as uuidv4 } from 'uuid';
+import Conversations from './conversations.js'
 
 const MAX_RESPONSE_CHUNK_LENGTH = 1500
 dotenv.config()
@@ -25,7 +26,7 @@ const commands = [
 async function initChatGPT() {
     let sessionToken
     let counter = 10;
-    while (counter>0) {
+    while (counter > 0) {
         try {
             sessionToken = await OPENAI_SESSION.getSession(process.env.OPENAI_EMAIL, process.env.OPENAI_PASSWORD)
             break
@@ -35,7 +36,7 @@ async function initChatGPT() {
         }
     }
 
-    if(counter==0){
+    if (counter == 0) {
         throw "Invalid Auth Info!"
     }
 
@@ -43,7 +44,7 @@ async function initChatGPT() {
 
     await api.ensureAuth()
 
-    async function updateSessionToken(){
+    async function updateSessionToken() {
         try {
             let sessionToken = await OPENAI_SESSION.getSession(process.env.OPENAI_EMAIL, process.env.OPENAI_PASSWORD)
             let new_api = new ChatGPTAPI({ sessionToken })
@@ -53,16 +54,19 @@ async function initChatGPT() {
             api = new_api
             console.log("Session Token Changed - ", new Date())
         } catch (e) {
-            console.error(e)
-        }finally{
-            setTimeout(updateSessionToken,600000)
+            console.error("Error session token refresh : " + e + " - " + new Date());
+        } finally {
+            setTimeout(updateSessionToken, 600000)
         }
     }
-    setTimeout(updateSessionToken,600000)
+    setTimeout(updateSessionToken, 600000)
 
     return {
         sendMessage: (message, opts = {}) => {
             return api.sendMessage(message, opts)
+        },
+        getConversation(opts = {}) {
+            return api.getConversation(opts)
         }
     };
 }
@@ -80,7 +84,7 @@ async function initDiscordCommands() {
 }
 
 async function main() {
-    const chatGTP = await initChatGPT().catch(e=>{
+    const chatGTP = await initChatGPT().catch(e => {
         console.error(e)
         process.exit()
     })
@@ -104,24 +108,43 @@ async function main() {
         console.log(new Date())
     });
 
-    function askQuestion(question, cb,opts={}) {
+    function askQuestion(question, cb, opts = {}) {
+
+        const { conversationInfo } = opts
+
         let tmr = setTimeout(() => {
             cb("Oppss, something went wrong! (Timeout)")
         }, 45000)
 
-        chatGTP.sendMessage(question,opts).then((response) => {
-            clearTimeout(tmr)
-            cb(response)
-        }).catch(() => {
-            cb("Oppss, something went wrong! (Error)")
-        })
+        if (conversationInfo) {
+            let conversation = chatGTP.getConversation({
+                conversationId: conversationInfo.conversationId,
+                parentMessageId: conversationInfo.parentMessageId
+            })
+
+            conversation.sendMessage(question).then(response => {
+                conversationInfo.conversationId = conversation.conversationId
+                conversationInfo.parentMessageId = conversation.parentMessageId
+                clearTimeout(tmr)
+                cb(response)
+            }).catch(() => {
+                cb("Oppss, something went wrong! (Error)")
+            })
+        } else {
+            chatGTP.sendMessage(question).then((response) => {
+                clearTimeout(tmr)
+                cb(response)
+            }).catch(() => {
+                cb("Oppss, something went wrong! (Error)")
+            })
+        }
     }
 
-    async function splitAndSendResponse(resp,user){
-        while(resp.length > 0){
-            let end = Math.min(MAX_RESPONSE_CHUNK_LENGTH,resp.length)
-            await user.send(resp.slice(0,end))
-            resp = resp.slice(end,resp.length)
+    async function splitAndSendResponse(resp, user) {
+        while (resp.length > 0) {
+            let end = Math.min(MAX_RESPONSE_CHUNK_LENGTH, resp.length)
+            await user.send(resp.slice(0, end))
+            resp = resp.slice(end, resp.length)
         }
     }
 
@@ -129,24 +152,32 @@ async function main() {
         if (process.env.ENABLE_DIRECT_MESSAGES !== "true" || message.channel.type != ChannelType.DM || message.author.bot) {
             return;
         }
-
         const user = message.author
 
         console.log("----Direct Message---")
-        console.log("Date    : "+new Date())
-        console.log("UserId  : "+user.id)
-        console.log("User    : "+user.username)
-        console.log("Message : "+message.content)
+        console.log("Date    : " + new Date())
+        console.log("UserId  : " + user.id)
+        console.log("User    : " + user.username)
+        console.log("Message : " + message.content)
         console.log("--------------")
 
+        if (message.content == "reset") {
+            Conversations.resetConversation(user.id)
+            user.send("Who are you ?")
+            return;
+        }
+
+        let conversationInfo = Conversations.getConversation(user.id)
+
         let sentMessage = await user.send("Hmm, let me think...")
+
         askQuestion(message.content, (response) => {
-            if(response.length >= MAX_RESPONSE_CHUNK_LENGTH){
-                splitAndSendResponse(response,user)
-            }else{
+            if (response.length >= MAX_RESPONSE_CHUNK_LENGTH) {
+                splitAndSendResponse(response, user)
+            } else {
                 sentMessage.edit(response)
             }
-        })
+        }, { conversationInfo })
     })
 
     client.on("interactionCreate", async interaction => {
@@ -154,10 +185,10 @@ async function main() {
         interaction.reply({ content: "let me think..." })
         try {
             askQuestion(question, (content) => {
-                if(content.length >= MAX_RESPONSE_CHUNK_LENGTH){
-                    interaction.editReply({ content:"The answer to this question is very long, so I will answer by dm." })
-                    splitAndSendResponse(content,interaction.user)
-                }else{
+                if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
+                    interaction.editReply({ content: "The answer to this question is very long, so I will answer by dm." })
+                    splitAndSendResponse(content, interaction.user)
+                } else {
                     interaction.editReply({ content })
                 }
             })
