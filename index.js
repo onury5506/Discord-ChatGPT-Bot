@@ -43,7 +43,7 @@ async function initChatGPT() {
 
     await api.ensureAuth()
 
-    setInterval(async () => {
+    async function updateSessionToken(){
         try {
             let sessionToken = await OPENAI_SESSION.getSession(process.env.OPENAI_EMAIL, process.env.OPENAI_PASSWORD)
             let new_api = new ChatGPTAPI({ sessionToken })
@@ -54,8 +54,11 @@ async function initChatGPT() {
             console.log("Session Token Changed - ", new Date())
         } catch (e) {
             console.error(e)
+        }finally{
+            setTimeout(updateSessionToken,600000)
         }
-    }, 600000)
+    }
+    setTimeout(updateSessionToken,600000)
 
     return {
         sendMessage: (message, opts = {}) => {
