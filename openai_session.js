@@ -8,7 +8,7 @@ const OPENAI_URLS = {
 
 const SELECTORS = {
     login_button_selector: "#__next > div > div > div.flex.flex-row.gap-3 > button:nth-child(1)",
-    email_input_selector: "#usernameasd",
+    email_input_selector: "#username",
     button_login_id: "._button-login-id",
     button_login_password: "._button-login-password",
     password_input_selector: "#password",
