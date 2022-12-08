@@ -8,7 +8,7 @@ You can ask anything with ```/ask 'question'``` command.
 
 You can restart conversation by sending "restart" message to bot.
 
-## [You can test it on discord](https://discord.gg/VP9xS6u3)
+## [You can test it on discord](https://discord.gg/xggt6w6Sz4)
 
 Screenshot : 
 ![Screenshot_1](https://raw.githubusercontent.com/onury5506/Discord-ChatGPT-Bot/master/screen_shot/Screenshot_1.jpg)
