@@ -170,11 +170,11 @@ async function main() {
         let conversationInfo = Conversations.getConversation(user.id)
         try {
             let sentMessage = await user.send("Hmm, let me think...")
-            askQuestion(message.content, (response) => {
+            askQuestion(message.content, async (response) => {
                 if (response.length >= MAX_RESPONSE_CHUNK_LENGTH) {
                     splitAndSendResponse(response, user)
                 } else {
-                    sentMessage.edit(response)
+                    await sentMessage.edit(response)
                 }
             }, { conversationInfo })
         } catch (e) {
@@ -185,13 +185,13 @@ async function main() {
     client.on("interactionCreate", async interaction => {
         const question = interaction.options.getString("question")
         try {
-            interaction.reply({ content: "let me think..." })
-            askQuestion(question, (content) => {
+            await interaction.reply({ content: "let me think..." })
+            askQuestion(question, async (content) => {
                 if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
-                    interaction.editReply({ content: "The answer to this question is very long, so I will answer by dm." })
+                    await interaction.editReply({ content: "The answer to this question is very long, so I will answer by dm." })
                     splitAndSendResponse(content, interaction.user)
                 } else {
-                    interaction.editReply({ content })
+                    await interaction.editReply({ content })
                 }
             })
         } catch (e) {
