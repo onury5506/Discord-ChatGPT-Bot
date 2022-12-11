@@ -1,9 +1,10 @@
 import dotenv from 'dotenv'
 import { ChatGPTAPI } from 'chatgpt'
-import { Client, GatewayIntentBits, REST, Routes, Partials, ChannelType } from 'discord.js'
+import { Client, GatewayIntentBits, REST, Routes, Partials, ChannelType, AttachmentBuilder } from 'discord.js'
 import OPENAI_SESSION from './openai_session.js'
 import { v4 as uuidv4 } from 'uuid';
 import Conversations from './conversations.js'
+import stableDiffusion from './stableDiffusion.js';
 
 const MAX_RESPONSE_CHUNK_LENGTH = 1500
 dotenv.config()
@@ -16,6 +17,18 @@ const commands = [
             {
                 name: "question",
                 description: "Your question",
+                type: 3,
+                required: true
+            }
+        ]
+    },
+    {
+        name: 'image',
+        description: 'Ask Anything!',
+        options: [
+            {
+                name: "prompt",
+                description: "Your prompt",
                 type: 3,
                 required: true
             }
@@ -182,7 +195,7 @@ async function main() {
         }
     })
 
-    client.on("interactionCreate", async interaction => {
+    async function handle_interaction_ask(interaction) {
         const question = interaction.options.getString("question")
         try {
             await interaction.reply({ content: "let me think..." })
@@ -197,7 +210,45 @@ async function main() {
         } catch (e) {
             console.error(e)
         }
+    }
 
+    async function handle_interaction_image(interaction) {
+        const prompt = interaction.options.getString("prompt")
+        try {
+            await interaction.reply({ content: "loading..." })
+            stableDiffusion.generate(prompt, async (result) => {
+                if (result.error) {
+                    await interaction.editReply({ content: "error..." })
+                    return;
+                }
+                try {
+                    const attachments = []
+                    for (let i = 0; i < result.results.length; i++) {
+                        let data = result.results[i].split(",")[1]
+                        const buffer = Buffer.from(data, "base64")
+                        let attachment = new AttachmentBuilder(buffer, { name: "result0.jpg" })
+                        attachments.push(attachment)
+                    }
+                    await interaction.editReply({ content: "done...", files: attachments })
+                } catch (e) {
+                    await interaction.editReply({ content: "error..." })
+                }
+
+            })
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    client.on("interactionCreate", async interaction => {
+        switch (interaction.commandName) {
+            case "ask":
+                handle_interaction_ask(interaction)
+                break;
+            case "image":
+                handle_interaction_image(interaction)
+                break
+        }
     });
 
     client.login(process.env.DISCORD_BOT_TOKEN);
