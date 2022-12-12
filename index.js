@@ -201,7 +201,7 @@ async function main() {
             await interaction.reply({ content: "let me think..." })
             askQuestion(question, async (content) => {
                 if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
-                    const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), 'response.txt');
+                    const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), { name: 'response.txt' });
                     await interaction.editReply({ files: [attachment] })
                     splitAndSendResponse(content, interaction.user)
                 } else {
