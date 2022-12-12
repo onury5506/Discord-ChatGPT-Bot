@@ -174,7 +174,7 @@ async function main() {
         console.log("Message : " + message.content)
         console.log("--------------")
 
-        if (message.content == "reset") {
+        if (message.content.toLowerCase() == "reset") {
             Conversations.resetConversation(user.id)
             user.send("Who are you ?")
             return;
@@ -201,7 +201,8 @@ async function main() {
             await interaction.reply({ content: "let me think..." })
             askQuestion(question, async (content) => {
                 if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
-                    await interaction.editReply({ content: "The answer to this question is very long, so I will answer by dm." })
+                    const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), 'response.txt');
+                    await interaction.editReply({ files: [attachment] })
                     splitAndSendResponse(content, interaction.user)
                 } else {
                     await interaction.editReply({ content })
