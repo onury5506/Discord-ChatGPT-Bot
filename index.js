@@ -203,7 +203,7 @@ async function main() {
                 if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
                     const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), 'response.txt');
                     await interaction.editReply({ files: [attachment] })
-                 // splitAndSendResponse(content, interaction.user)
+                    splitAndSendResponse(content, interaction.user)
                 } else {
                     await interaction.editReply({ content })
                 }
