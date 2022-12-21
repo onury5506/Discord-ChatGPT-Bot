@@ -190,7 +190,7 @@ async function main() {
     async function handle_interaction_image(interaction) {
         const prompt = interaction.options.getString("prompt")
         try {
-            await interaction.reply({ content: "loading..." })
+            interaction.deferReply()
             stableDiffusion.generate(prompt, async (result) => {
                 if (result.error) {
                     await interaction.editReply({ content: "error..." })
