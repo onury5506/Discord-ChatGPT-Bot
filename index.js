@@ -1,8 +1,6 @@
 import dotenv from 'dotenv'
-import { ChatGPTAPI } from 'chatgpt'
+import { ChatGPTAPIBrowser } from 'chatgpt'
 import { Client, GatewayIntentBits, REST, Routes, Partials, ChannelType, AttachmentBuilder } from 'discord.js'
-import OPENAI_SESSION from './openai_session.js'
-import { v4 as uuidv4 } from 'uuid';
 import Conversations from './conversations.js'
 import stableDiffusion from './stableDiffusion.js';
 
@@ -37,49 +35,16 @@ const commands = [
 ];
 
 async function initChatGPT() {
-    let sessionToken
-    let counter = 10;
-    while (counter > 0) {
-        try {
-            sessionToken = await OPENAI_SESSION.getSession(process.env.OPENAI_EMAIL, process.env.OPENAI_PASSWORD)
-            break
-        } catch (e) {
-            console.error("initChatGPT ERROR : " + e)
-            counter--;
-        }
-    }
+    const api = new ChatGPTAPIBrowser({
+        email: process.env.OPENAI_EMAIL,
+        password: process.env.OPENAI_PASSWORD
+    })
 
-    if (counter == 0) {
-        throw "Invalid Auth Info!"
-    }
-
-    let api = new ChatGPTAPI({ sessionToken })
-
-    await api.ensureAuth()
-
-    async function updateSessionToken() {
-        try {
-            let sessionToken = await OPENAI_SESSION.getSession(process.env.OPENAI_EMAIL, process.env.OPENAI_PASSWORD)
-            let new_api = new ChatGPTAPI({ sessionToken })
-
-            await new_api.ensureAuth()
-
-            api = new_api
-            console.log("Session Token Changed - ", new Date())
-        } catch (e) {
-            console.error("Error session token refresh : " + e + " - " + new Date());
-        } finally {
-            setTimeout(updateSessionToken, 600000)
-        }
-    }
-    setTimeout(updateSessionToken, 600000)
+    await api.initSession()
 
     return {
         sendMessage: (message, opts = {}) => {
             return api.sendMessage(message, opts)
-        },
-        getConversation(opts = {}) {
-            return api.getConversation(opts)
         }
     };
 }
@@ -130,34 +95,44 @@ async function main() {
         }, 45000)
 
         if (conversationInfo) {
-            let conversation = chatGTP.getConversation({
-                conversationId: conversationInfo.conversationId,
-                parentMessageId: conversationInfo.parentMessageId
-            })
-
-            conversation.sendMessage(question).then(response => {
-                conversationInfo.conversationId = conversation.conversationId
-                conversationInfo.parentMessageId = conversation.parentMessageId
+            chatGTP.sendMessage(question,{
+                //conversationId:conversationInfo.conversationId,
+            }).then(response => {
+                conversationInfo.conversationId = response.conversationId
+                conversationInfo.parentMessageId = response.parentMessageId
                 clearTimeout(tmr)
-                cb(response)
-            }).catch(() => {
+                cb(response.response)
+            }).catch((e) => {
                 cb("Oppss, something went wrong! (Error)")
+                console.error("dm error : " + e)
             })
         } else {
-            chatGTP.sendMessage(question).then((response) => {
+            chatGTP.sendMessage(question).then(({response}) => {
+                //console.log(response)
                 clearTimeout(tmr)
                 cb(response)
-            }).catch(() => {
+            }).catch((e) => {
                 cb("Oppss, something went wrong! (Error)")
+                console.error("/ask error : " + e)
             })
         }
     }
 
     async function splitAndSendResponse(resp, user) {
-        while (resp.length > 0) {
-            let end = Math.min(MAX_RESPONSE_CHUNK_LENGTH, resp.length)
-            await user.send(resp.slice(0, end))
-            resp = resp.slice(end, resp.length)
+        let tryCount = 3;
+        while (resp.length > 0 && tryCount > 0) {
+            try {
+                let end = Math.min(MAX_RESPONSE_CHUNK_LENGTH, resp.length)
+                await user.send(resp.slice(0, end))
+                resp = resp.slice(end, resp.length)
+            } catch (e) {
+                tryCount--
+                console.error("splitAndSendResponse Error : " + e + " | Counter " + tryCount)
+            }
+        }
+
+        if (tryCount <= 0) {
+            throw "Failed to send dm."
         }
     }
 
@@ -203,7 +178,6 @@ async function main() {
                 if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
                     const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), { name: 'response.txt' });
                     await interaction.editReply({ files: [attachment] })
-                    splitAndSendResponse(content, interaction.user)
                 } else {
                     await interaction.editReply({ content })
                 }

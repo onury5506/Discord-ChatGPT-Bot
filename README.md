@@ -30,7 +30,7 @@ npm install
 npm start
 ```
 
-### with docker
+### with docker -- not working for now ! --
 ```
 docker build -t discordchatgpt .
 docker run discordchatgpt
