@@ -7,30 +7,25 @@ import stableDiffusion from './stableDiffusion.js';
 const MAX_RESPONSE_CHUNK_LENGTH = 1500
 dotenv.config()
 
-const commands = [
-    {
+const commands = [{
         name: 'ask',
         description: 'Ask Anything!',
-        options: [
-            {
-                name: "question",
-                description: "Your question",
-                type: 3,
-                required: true
-            }
-        ]
+        options: [{
+            name: "question",
+            description: "Your question",
+            type: 3,
+            required: true
+        }]
     },
     {
         name: 'image',
         description: 'Ask Anything!',
-        options: [
-            {
-                name: "prompt",
-                description: "Your prompt",
-                type: 3,
-                required: true
-            }
-        ]
+        options: [{
+            name: "prompt",
+            description: "Your prompt",
+            type: 3,
+            required: true
+        }]
     },
 ];
 
@@ -95,11 +90,12 @@ async function main() {
         }, 45000)
 
         if (conversationInfo) {
-            chatGTP.sendMessage(question,{
-                //conversationId:conversationInfo.conversationId,
+            chatGTP.sendMessage(question, {
+                conversationId: conversationInfo.conversationId,
+                parentMessageId: conversationInfo.parentMessageId
             }).then(response => {
                 conversationInfo.conversationId = response.conversationId
-                conversationInfo.parentMessageId = response.parentMessageId
+                conversationInfo.parentMessageId = response.messageId
                 clearTimeout(tmr)
                 cb(response.response)
             }).catch((e) => {
@@ -107,7 +103,7 @@ async function main() {
                 console.error("dm error : " + e)
             })
         } else {
-            chatGTP.sendMessage(question).then(({response}) => {
+            chatGTP.sendMessage(question).then(({ response }) => {
                 //console.log(response)
                 clearTimeout(tmr)
                 cb(response)
@@ -158,7 +154,7 @@ async function main() {
         let conversationInfo = Conversations.getConversation(user.id)
         try {
             let sentMessage = await user.send("Hmm, let me think...")
-            askQuestion(message.content, async (response) => {
+            askQuestion(message.content, async(response) => {
                 if (response.length >= MAX_RESPONSE_CHUNK_LENGTH) {
                     splitAndSendResponse(response, user)
                 } else {
@@ -174,7 +170,7 @@ async function main() {
         const question = interaction.options.getString("question")
         try {
             await interaction.reply({ content: "let me think..." })
-            askQuestion(question, async (content) => {
+            askQuestion(question, async(content) => {
                 if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
                     const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), { name: 'response.txt' });
                     await interaction.editReply({ files: [attachment] })
@@ -191,7 +187,7 @@ async function main() {
         const prompt = interaction.options.getString("prompt")
         try {
             await interaction.reply({ content: "loading..." })
-            stableDiffusion.generate(prompt, async (result) => {
+            stableDiffusion.generate(prompt, async(result) => {
                 if (result.error) {
                     await interaction.editReply({ content: "error..." })
                     return;
