@@ -96,10 +96,11 @@ async function main() {
 
         if (conversationInfo) {
             chatGTP.sendMessage(question,{
-                //conversationId:conversationInfo.conversationId,
+                conversationId: conversationInfo.conversationId,
+                parentMessageId: conversationInfo.parentMessageId
             }).then(response => {
                 conversationInfo.conversationId = response.conversationId
-                conversationInfo.parentMessageId = response.parentMessageId
+                conversationInfo.parentMessageId = response.messageId
                 clearTimeout(tmr)
                 cb(response.response)
             }).catch((e) => {
