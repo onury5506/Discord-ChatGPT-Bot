@@ -172,6 +172,10 @@ async function main() {
     })
 
     async function handle_interaction_ask(interaction) {
+	    const user = interaction.user
+        
+        // Begin conversation
+	    let conversationInfo = Conversations.getConversation(user.id)
         const question = interaction.options.getString("question")
         try {
             await interaction.reply({ content: "let me think..." })
@@ -182,7 +186,7 @@ async function main() {
                 } else {
                     await interaction.editReply({ content })
                 }
-            })
+            }, { conversationInfo })
         } catch (e) {
             console.error(e)
         }
