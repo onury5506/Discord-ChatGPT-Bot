@@ -173,7 +173,7 @@ async function main() {
     async function handle_interaction_ask(interaction) {
         const question = interaction.options.getString("question")
         try {
-            await interaction.reply({ content: "let me think..." })
+            await interaction.deferReply()
             askQuestion(question, async (content) => {
                 if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
                     const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), { name: 'response.txt' });
@@ -190,7 +190,7 @@ async function main() {
     async function handle_interaction_image(interaction) {
         const prompt = interaction.options.getString("prompt")
         try {
-            await interaction.reply({ content: "loading..." })
+            await interaction.deferReply()
             stableDiffusion.generate(prompt, async (result) => {
                 if (result.error) {
                     await interaction.editReply({ content: "error..." })
