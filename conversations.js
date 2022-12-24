@@ -1,5 +1,5 @@
 const conversationMap = {}
-const conversationTimeLimit = 300000 // 5 minutes
+const conversationTimeLimit = process.env.CONVERSATION_TIME_LIMIT
 
 function getConversation(userid){
     let conversation = {
