@@ -1,5 +1,12 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
 const conversationMap = {}
-const conversationTimeLimit = 300000 // 5 minutes
+let conversationTimeLimit = parseInt(process.env.CONVERSATION_MEMORY_SECONDS)*1000
+
+if(!conversationTimeLimit || conversationTimeLimit <= 0){
+    conversationTimeLimit = 300000
+}
 
 function getConversation(userid){
     let conversation = {
