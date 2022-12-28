@@ -16,8 +16,10 @@ function getConversation(userid){
     
     if(conversationMap[userid]){
         conversation = conversationMap[userid]
+        conversation.newConversation = false
     }else{
         conversationMap[userid] = conversation
+        conversation.newConversation = true
     }
 
     conversation.lastSeen = Date.now()

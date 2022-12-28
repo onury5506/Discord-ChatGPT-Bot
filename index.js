@@ -86,13 +86,30 @@ async function main() {
         console.log(new Date())
     });
 
-    function askQuestion(question, cb, opts = {}) {
+    async function askQuestion(question, cb, opts = {}) {
 
         const { conversationInfo } = opts
 
         let tmr = setTimeout(() => {
             cb("Oppss, something went wrong! (Timeout)")
         }, 45000)
+
+        if(process.env.CONVERSATION_START_PROMPT.toLowerCase() != "false" && conversationInfo.newConversation){
+            await chatGTP.sendMessage(process.env.CONVERSATION_START_PROMPT,{
+                conversationId: conversationInfo.conversationId,
+                parentMessageId: conversationInfo.parentMessageId
+            }).then(response => {
+                conversationInfo.conversationId = response.conversationId
+                conversationInfo.parentMessageId = response.messageId
+                clearTimeout(tmr)
+                tmr = setTimeout(() => {
+                    cb("Oppss, something went wrong! (Timeout)")
+                }, 45000)
+            }).catch((e) => {
+                cb("Oppss, something went wrong! (Error)")
+                console.error("dm error : " + e)
+            })
+        }
 
         if (conversationInfo) {
             chatGTP.sendMessage(question,{
