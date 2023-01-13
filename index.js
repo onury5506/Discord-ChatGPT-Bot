@@ -37,7 +37,8 @@ const commands = [
 async function initChatGPT() {
     const api = new ChatGPTAPIBrowser({
         email: process.env.OPENAI_EMAIL,
-        password: process.env.OPENAI_PASSWORD
+        password: process.env.OPENAI_PASSWORD,
+        isGoogleLogin: process.env.IS_GOOGLE_LOGIN?.toLocaleLowerCase()=="true"
     })
 
     await api.initSession()
