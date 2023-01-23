@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 
-const API_URL = "wss://runwayml-stable-diffusion-v1-5.hf.space/queue/join"
+const API_URL = "wss://stabilityai-stable-diffusion.hf.space/queue/join"//"wss://runwayml-stable-diffusion-v1-5.hf.space/queue/join"
 
 function generateHash() {
     const chars = "qwertyuopasdfghjklizxcvbnm0123456789"
@@ -14,7 +14,7 @@ function generateHash() {
     }
 }
 
-function generate(prompt, cb) {
+function generate(prompt, cb, tryCount=5) {
     const client = new WebSocket(API_URL);
     const hash = generateHash()
 
@@ -29,7 +29,8 @@ function generate(prompt, cb) {
         //console.log("ws connected!")
     })
 
-    client.on("error",()=>{
+    client.on("error",(err)=>{
+        console.log(err)
         cb({
             error:true,
         })
@@ -42,7 +43,7 @@ function generate(prompt, cb) {
             client.send(JSON.stringify(hash))
         } else if (msg.msg == "send_data") {
             let data = {
-                data: [prompt],
+                data: [prompt,"",9],
                 ...hash
             }
             client.send(JSON.stringify(data))
@@ -60,6 +61,16 @@ function generate(prompt, cb) {
                 })
             }
             
+        }else if(msg.msg == "queue_full"){
+            if(tryCount <= 0){
+                cb({
+                    error:true,
+                })
+            }else{
+                setTimeout(()=>{
+                    generate(prompt,cb,tryCount-1)
+                },5000)
+            }
         }
 
     })

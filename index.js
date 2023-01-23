@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 import { ChatGPTAPIBrowser } from 'chatgpt'
-import { Client, GatewayIntentBits, REST, Routes, Partials, ChannelType, AttachmentBuilder } from 'discord.js'
+import { Client, GatewayIntentBits, REST, Routes, Partials, ChannelType, AttachmentBuilder, EmbedBuilder } from 'discord.js'
 import Conversations from './conversations.js'
 import stableDiffusion from './stableDiffusion.js';
 
@@ -38,7 +38,7 @@ async function initChatGPT() {
     const api = new ChatGPTAPIBrowser({
         email: process.env.OPENAI_EMAIL,
         password: process.env.OPENAI_PASSWORD,
-        isGoogleLogin: process.env.IS_GOOGLE_LOGIN?.toLocaleLowerCase()=="true"
+        isGoogleLogin: process.env.IS_GOOGLE_LOGIN?.toLocaleLowerCase() == "true"
     })
 
     await api.initSession()
@@ -93,10 +93,10 @@ async function main() {
 
         let tmr = setTimeout(() => {
             cb("Oppss, something went wrong! (Timeout)")
-        }, 45000)
+        }, 120000)
 
-        if(process.env.CONVERSATION_START_PROMPT.toLowerCase() != "false" && conversationInfo.newConversation){
-            await chatGTP.sendMessage(process.env.CONVERSATION_START_PROMPT,{
+        if (process.env.CONVERSATION_START_PROMPT.toLowerCase() != "false" && conversationInfo.newConversation) {
+            await chatGTP.sendMessage(process.env.CONVERSATION_START_PROMPT, {
                 conversationId: conversationInfo.conversationId,
                 parentMessageId: conversationInfo.parentMessageId
             }).then(response => {
@@ -113,7 +113,7 @@ async function main() {
         }
 
         if (conversationInfo) {
-            chatGTP.sendMessage(question,{
+            chatGTP.sendMessage(question, {
                 conversationId: conversationInfo.conversationId,
                 parentMessageId: conversationInfo.parentMessageId
             }).then(response => {
@@ -126,7 +126,7 @@ async function main() {
                 console.error("dm error : " + e)
             })
         } else {
-            chatGTP.sendMessage(question).then(({response}) => {
+            chatGTP.sendMessage(question).then(({ response }) => {
                 //console.log(response)
                 clearTimeout(tmr)
                 cb(response)
@@ -153,6 +153,32 @@ async function main() {
         if (tryCount <= 0) {
             throw "Failed to send dm."
         }
+    }
+
+    function createEmbedForAskCommand(user, prompt, response) {
+
+        if (prompt.length >= 250) {
+            prompt = prompt.slice(0, 250) + "..."
+        }
+
+        const embed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setAuthor({ name: user.username })
+            .setTitle(prompt)
+            .setDescription(response.slice(0, Math.min(response.length, 4096)))
+
+        if (response.length > 4096) {
+            response = response.slice(4096, response.length)
+            for (let i = 0; i < 10 && response.length > 0; i++) {
+                embed.addFields({
+                    name: "",
+                    value: response.slice(0, Math.min(response.length, 1024))
+                })
+                response = response.slice(Math.min(response.length, 1024), response.length)
+            }
+        }
+
+        return embed
     }
 
     client.on("messageCreate", async message => {
@@ -190,20 +216,44 @@ async function main() {
     })
 
     async function handle_interaction_ask(interaction) {
-	    const user = interaction.user
-        
+        const user = interaction.user
+
         // Begin conversation
-	    let conversationInfo = Conversations.getConversation(user.id)
+        let conversationInfo = Conversations.getConversation(user.id)
         const question = interaction.options.getString("question")
+
+        if(question.toLowerCase() == "reset"){
+            Conversations.resetConversation(user.id)
+            const embed = createEmbedForAskCommand(user, question, "Who are you ?")
+            await interaction.reply({ embeds: [embed] })
+            return;
+        }
+
         try {
             await interaction.deferReply()
             askQuestion(question, async (content) => {
+                /*
                 if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
                     const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), { name: 'response.txt' });
                     await interaction.editReply({ files: [attachment] })
                 } else {
                     await interaction.editReply({ content })
                 }
+                */
+                const embed = createEmbedForAskCommand(user, question, content)
+                interaction.editReply({ embeds: [embed] })
+                let stableDiffusionPrompt = content.slice(0,Math.min(content.length,200))
+                stableDiffusion.generate(stableDiffusionPrompt, (result) => {
+                    const results = result.results
+                    if (!results || results.length == 0) {
+                        return;
+                    }
+                    let data = result.results[0].split(",")[1]
+                    const buffer = Buffer.from(data, "base64")
+                    let attachment = new AttachmentBuilder(buffer, { name: "result0.jpg" })
+                    embed.setImage("attachment://result0.jpg")
+                    interaction.editReply({ embeds: [embed], files:[attachment] })
+                })
             }, { conversationInfo })
         } catch (e) {
             console.error(e)
