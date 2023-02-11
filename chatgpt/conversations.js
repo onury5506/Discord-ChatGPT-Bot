@@ -1,6 +1,3 @@
-import dotenv from 'dotenv'
-dotenv.config()
-
 const conversationMap = {}
 let conversationTimeLimit = parseInt(process.env.CONVERSATION_MEMORY_SECONDS)*1000
 
