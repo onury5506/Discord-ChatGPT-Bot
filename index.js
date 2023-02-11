@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import { ChatGPTAPIBrowser } from 'chatgpt'
+import { ChatGPTAPI } from 'chatgpt'
 import { Client, GatewayIntentBits, REST, Routes, Partials, ChannelType, AttachmentBuilder, EmbedBuilder } from 'discord.js'
 import Conversations from './conversations.js'
 import stableDiffusion from './stableDiffusion.js';
@@ -35,13 +35,9 @@ const commands = [
 ];
 
 async function initChatGPT() {
-    const api = new ChatGPTAPIBrowser({
-        email: process.env.OPENAI_EMAIL,
-        password: process.env.OPENAI_PASSWORD,
-        isGoogleLogin: process.env.IS_GOOGLE_LOGIN?.toLocaleLowerCase() == "true"
+    const api = new ChatGPTAPI({
+        apiKey: process.env.OPENAI_API_KEY
     })
-
-    await api.initSession()
 
     return {
         sendMessage: (message, opts = {}) => {
@@ -101,7 +97,7 @@ async function main() {
                 parentMessageId: conversationInfo.parentMessageId
             }).then(response => {
                 conversationInfo.conversationId = response.conversationId
-                conversationInfo.parentMessageId = response.messageId
+                conversationInfo.parentMessageId = response.id
                 clearTimeout(tmr)
                 tmr = setTimeout(() => {
                     cb("Oppss, something went wrong! (Timeout)")
@@ -118,18 +114,18 @@ async function main() {
                 parentMessageId: conversationInfo.parentMessageId
             }).then(response => {
                 conversationInfo.conversationId = response.conversationId
-                conversationInfo.parentMessageId = response.messageId
+                conversationInfo.parentMessageId = response.id
                 clearTimeout(tmr)
-                cb(response.response)
+                cb(response.text)
             }).catch((e) => {
                 cb("Oppss, something went wrong! (Error)")
                 console.error("dm error : " + e)
             })
         } else {
             chatGTP.sendMessage(question).then(({ response }) => {
-                //console.log(response)
+                console.log(response)
                 clearTimeout(tmr)
-                cb(response)
+                cb(response.text)
             }).catch((e) => {
                 cb("Oppss, something went wrong! (Error)")
                 console.error("/ask error : " + e)

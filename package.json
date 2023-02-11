@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chatgpt": "^3.5.1",
+    "chatgpt": "^4.2.0",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "puppeteer": "^19.3.0",
