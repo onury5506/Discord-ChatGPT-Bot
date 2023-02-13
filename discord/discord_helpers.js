@@ -1,4 +1,8 @@
-import { EmbedBuilder } from 'discord.js'
+import { EmbedBuilder, AttachmentBuilder } from 'discord.js'
+
+import stableDiffusion from '../stablediffusion/stableDiffusion.js';
+
+export const MAX_RESPONSE_CHUNK_LENGTH = 1500
 
 export function createEmbedForAskCommand(user, prompt, response) {
 
@@ -41,5 +45,33 @@ export async function splitAndSendResponse(resp, user) {
 
     if (tryCount <= 0) {
         throw "Failed to send dm."
+    }
+}
+
+export async function generateInteractionReply(interaction, user, question, content) {
+    if (process.env.USE_EMBED.toLowerCase() == "true") {
+        //embed
+        const embed = createEmbedForAskCommand(user, question, content)
+        await interaction.editReply({ embeds: [embed] })
+        let stableDiffusionPrompt = content.slice(0, Math.min(content.length, 200))
+        stableDiffusion.generate(stableDiffusionPrompt, async (result) => {
+            const results = result.results
+            if (!results || results.length == 0) {
+                return;
+            }
+            let data = result.results[0].split(",")[1]
+            const buffer = Buffer.from(data, "base64")
+            let attachment = new AttachmentBuilder(buffer, { name: "result0.jpg" })
+            embed.setImage("attachment://result0.jpg")
+            await interaction.editReply({ embeds: [embed], files: [attachment] })
+        })
+    } else {
+        //normal message
+        if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
+            const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), { name: 'response.txt' });
+            await interaction.editReply({ files: [attachment] })
+        } else {
+            await interaction.editReply({ content })
+        }
     }
 }

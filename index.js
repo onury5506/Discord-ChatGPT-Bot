@@ -4,9 +4,8 @@ dotenv.config()
 import { Client, GatewayIntentBits, Partials, ChannelType } from 'discord.js'
 import { initChatGPT, askQuestion } from './chatgpt/chatgpt.js'
 import { initDiscordCommands, handle_interaction_ask, handle_interaction_image } from './discord/discord_commands.js'
-import { splitAndSendResponse } from './discord/discord_helpers.js'
-
-const MAX_RESPONSE_CHUNK_LENGTH = 1500
+import { splitAndSendResponse, MAX_RESPONSE_CHUNK_LENGTH } from './discord/discord_helpers.js'
+import Conversations from './chatgpt/conversations.js'
 
 async function main() {
     await initChatGPT().catch(e => {

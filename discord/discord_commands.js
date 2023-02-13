@@ -3,7 +3,7 @@ import { REST, Routes, AttachmentBuilder } from 'discord.js'
 import stableDiffusion from '../stablediffusion/stableDiffusion.js';
 import Conversations from '../chatgpt/conversations.js'
 import { askQuestion } from '../chatgpt/chatgpt.js';
-import { createEmbedForAskCommand } from './discord_helpers.js';
+import { generateInteractionReply } from './discord_helpers.js';
 
 export const commands = [
     {
@@ -50,31 +50,15 @@ export async function handle_interaction_ask(interaction) {
     // Begin conversation
     let conversationInfo = Conversations.getConversation(user.id)
     const question = interaction.options.getString("question")
-
+    await interaction.deferReply()
     if (question.toLowerCase() == "reset") {
-        Conversations.resetConversation(user.id)
-        const embed = createEmbedForAskCommand(user, question, "Who are you ?")
-        await interaction.reply({ embeds: [embed] })
+        generateInteractionReply(interaction,user,question,"Who are you ?")
         return;
     }
 
     try {
-        await interaction.deferReply()
         askQuestion(question, async (content) => {
-            const embed = createEmbedForAskCommand(user, question, content)
-            interaction.editReply({ embeds: [embed] })
-            let stableDiffusionPrompt = content.slice(0, Math.min(content.length, 200))
-            stableDiffusion.generate(stableDiffusionPrompt, (result) => {
-                const results = result.results
-                if (!results || results.length == 0) {
-                    return;
-                }
-                let data = result.results[0].split(",")[1]
-                const buffer = Buffer.from(data, "base64")
-                let attachment = new AttachmentBuilder(buffer, { name: "result0.jpg" })
-                embed.setImage("attachment://result0.jpg")
-                interaction.editReply({ embeds: [embed], files: [attachment] })
-            })
+            generateInteractionReply(interaction,user,question,content)
         }, { conversationInfo })
     } catch (e) {
         console.error(e)
