@@ -1,4 +1,5 @@
-import { ChatGPTAPI } from 'chatgpt'
+import { ChatGPTUnofficialProxyAPI  } from 'chatgpt'
+import { getAccessToken } from './access_token.js'
 
 const chatGPT = {
     init: false,
@@ -6,15 +7,23 @@ const chatGPT = {
 }
 
 export async function initChatGPT() {
-    const api = new ChatGPTAPI({
-        apiKey: process.env.OPENAI_API_KEY
+    const api = new ChatGPTUnofficialProxyAPI ({
+        accessToken: await getAccessToken(),
+        apiReverseProxyUrl: process.env.API_REVERSE_PROXY_SERVER
     })
 
-    chatGPT.sendMessage = (message, opts = {}) => {
-        return api.sendMessage(message, opts)
+    chatGPT.sendMessage = async (message, opts = {}) => {
+        let result = await api.sendMessage(message, {
+            ...opts
+        })
+
+        result.parentMessageId = result.id
+        return result
     }
 
     chatGPT.init = true
+
+    setTimeout(initChatGPT,1000*60*60*8) // reinir after 8 hours
 }
 
 export async function askQuestion(question, cb, opts = {}) {
@@ -31,22 +40,7 @@ export async function askQuestion(question, cb, opts = {}) {
     }, 120000)
 
     if (process.env.CONVERSATION_START_PROMPT.toLowerCase() != "false" && conversationInfo.newConversation) {
-        try{
-            const response = await chatGPT.sendMessage(process.env.CONVERSATION_START_PROMPT, {
-                conversationId: conversationInfo.conversationId,
-                parentMessageId: conversationInfo.parentMessageId
-            })
-            conversationInfo.conversationId = response.conversationId
-            conversationInfo.parentMessageId = response.id
-            clearTimeout(tmr)
-            tmr = setTimeout(() => {
-                cb("Oppss, something went wrong! (Timeout)")
-            }, 120000)
-        }catch(e){
-            clearTimeout(tmr)
-            cb("Oppss, something went wrong! (Error)")
-            return;
-        }
+        question = process.env.CONVERSATION_START_PROMPT + "\n\n" + question
     }
 
     try{
@@ -55,7 +49,7 @@ export async function askQuestion(question, cb, opts = {}) {
             parentMessageId: conversationInfo.parentMessageId
         })
         conversationInfo.conversationId = response.conversationId
-        conversationInfo.parentMessageId = response.id
+        conversationInfo.parentMessageId = response.parentMessageId
         cb(response.text)
     }catch(e){
         cb("Oppss, something went wrong! (Error)")

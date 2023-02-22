@@ -1,6 +1,6 @@
 {
   "name": "chatgpt-discordjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -12,9 +12,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chatgpt": "^4.2.0",
+    "chatgpt": "^4.7.1",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
+    "fetch-cookie": "^2.1.0",
     "ws": "^8.11.0"
   },
   "devDependencies": {

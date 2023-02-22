@@ -3,7 +3,7 @@ import { REST, Routes, AttachmentBuilder } from 'discord.js'
 import stableDiffusion from '../stablediffusion/stableDiffusion.js';
 import Conversations from '../chatgpt/conversations.js'
 import { askQuestion } from '../chatgpt/chatgpt.js';
-import { generateInteractionReply } from './discord_helpers.js';
+import { generateInteractionReply, createEmbedsForImageCommand } from './discord_helpers.js';
 
 export const commands = [
     {
@@ -66,6 +66,7 @@ export async function handle_interaction_ask(interaction) {
 }
 
 export async function handle_interaction_image(interaction) {
+    const user = interaction.user
     const prompt = interaction.options.getString("prompt")
     try {
         await interaction.deferReply()
@@ -74,16 +75,12 @@ export async function handle_interaction_image(interaction) {
                 await interaction.editReply({ content: "error..." })
                 return;
             }
+            
             try {
-                const attachments = []
-                for (let i = 0; i < result.results.length; i++) {
-                    let data = result.results[i].split(",")[1]
-                    const buffer = Buffer.from(data, "base64")
-                    let attachment = new AttachmentBuilder(buffer, { name: "result0.jpg" })
-                    attachments.push(attachment)
-                }
-                await interaction.editReply({ content: "done...", files: attachments })
+                let embeds = createEmbedsForImageCommand(user,prompt,result.results)
+                await interaction.editReply(embeds)
             } catch (e) {
+                console.log(e)
                 await interaction.editReply({ content: "error..." })
             }
 

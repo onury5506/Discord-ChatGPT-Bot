@@ -30,6 +30,51 @@ export function createEmbedForAskCommand(user, prompt, response) {
     return embed
 }
 
+export function createEmbedsForImageCommand(user, prompt, images) {
+    let embeds = []
+    let files = []
+
+    if (prompt.length >= 250) {
+        prompt = prompt.slice(0, 250) + "..."
+    }
+
+    if (images.length == 0) {
+        embeds.push(
+            new EmbedBuilder()
+                .setColor(0x0099FF)
+                .setAuthor({ name: user.username })
+                .setTitle(prompt)
+                .setDescription("Image didn't generated for this prompt 😔")
+        )
+    }
+
+    for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        let embed = new EmbedBuilder().setURL("https://onuryildiz.dev")
+
+        if (i == 0) {
+            embed.setColor(0x0099FF)
+                .setAuthor({ name: user.username })
+                .setTitle(prompt)
+        }
+
+        let data = image.split(",")[1]
+        const buffer = Buffer.from(data, "base64")
+        
+        let attachment = new AttachmentBuilder(buffer, { name: `result${i}.jpg` })
+        embed.setImage(`attachment://result${i}.jpg`)
+
+        embeds.push(embed)
+        files.push(attachment)
+    }
+
+    return {
+        embeds,
+        files
+    }
+
+}
+
 export async function splitAndSendResponse(resp, user) {
     let tryCount = 3;
     while (resp.length > 0 && tryCount > 0) {
