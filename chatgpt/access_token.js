@@ -1,4 +1,4 @@
-import OpenAITokenGen from "./auth.js";
+import OpenAITokenGen from "aikey";
 
 export async function getAccessToken(){
     const generator = new OpenAITokenGen();
