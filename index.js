@@ -1,6 +1,4 @@
-import dotenv from 'dotenv'
-dotenv.config()
-
+import 'dotenv/config'
 import { Client, GatewayIntentBits, Partials, ChannelType } from 'discord.js'
 import { initChatGPT, askQuestion } from './chatgpt/chatgpt.js'
 import { initDiscordCommands, handle_interaction_ask, handle_interaction_image } from './discord/discord_commands.js'

@@ -72,16 +72,16 @@ export async function handle_interaction_image(interaction) {
         await interaction.deferReply()
         stableDiffusion.generate(prompt, async (result) => {
             if (result.error) {
-                await interaction.editReply({ content: "error..." })
+                await interaction.editReply({ content: "error..." }).catch(()=>{})
                 return;
             }
             
             try {
                 let embeds = createEmbedsForImageCommand(user,prompt,result.results)
-                await interaction.editReply(embeds)
+                await interaction.editReply(embeds).catch(()=>{})
             } catch (e) {
                 console.log(e)
-                await interaction.editReply({ content: "error..." })
+                await interaction.editReply({ content: "error..." }).catch(()=>{})
             }
 
         })

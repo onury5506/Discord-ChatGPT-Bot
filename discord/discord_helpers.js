@@ -97,7 +97,7 @@ export async function generateInteractionReply(interaction, user, question, cont
     if (process.env.USE_EMBED.toLowerCase() == "true") {
         //embed
         const embed = createEmbedForAskCommand(user, question, content)
-        await interaction.editReply({ embeds: [embed] })
+        await interaction.editReply({ embeds: [embed] }).catch(()=>{})
         let stableDiffusionPrompt = content.slice(0, Math.min(content.length, 200))
         stableDiffusion.generate(stableDiffusionPrompt, async (result) => {
             const results = result.results
@@ -108,15 +108,15 @@ export async function generateInteractionReply(interaction, user, question, cont
             const buffer = Buffer.from(data, "base64")
             let attachment = new AttachmentBuilder(buffer, { name: "result0.jpg" })
             embed.setImage("attachment://result0.jpg")
-            await interaction.editReply({ embeds: [embed], files: [attachment] })
+            await interaction.editReply({ embeds: [embed], files: [attachment] }).catch(()=>{})
         })
     } else {
         //normal message
         if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
             const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), { name: 'response.txt' });
-            await interaction.editReply({ files: [attachment] })
+            await interaction.editReply({ files: [attachment] }).catch(()=>{})
         } else {
-            await interaction.editReply({ content })
+            await interaction.editReply({ content }).catch(()=>{})
         }
     }
 }
