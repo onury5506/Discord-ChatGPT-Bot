@@ -29,7 +29,6 @@ function resetConversation(userid){
 }
 
 function cleanUnactiveConversations(){
-    
     try{
         const users = Object.keys(conversationMap)
         users.forEach((user)=>{
@@ -45,7 +44,9 @@ function cleanUnactiveConversations(){
     }
 }
 
-cleanUnactiveConversations()
+if(process.env.CONVERSATION_MEMORY_SECONDS.toLocaleLowerCase() != "false"){
+    cleanUnactiveConversations()
+}
 
 export default {
     getConversation,
