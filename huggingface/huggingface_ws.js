@@ -1,7 +1,5 @@
 import WebSocket from 'ws';
 
-const API_URL = "wss://stabilityai-stable-diffusion.hf.space/queue/join"//"wss://runwayml-stable-diffusion-v1-5.hf.space/queue/join"
-
 function generateHash() {
     const chars = "qwertyuopasdfghjklizxcvbnm0123456789"
     let hash = ""
@@ -14,61 +12,62 @@ function generateHash() {
     }
 }
 
-function generate(prompt, cb, tryCount=5) {
+function request(API_URL,userData, callback,opts={}, tryCount=5) {
     const client = new WebSocket(API_URL);
     const hash = generateHash()
 
     let tmr = setTimeout(() => {
         client.close()
-        cb({
+        callback({
             error: true
         })
     }, 120000);
 
     client.on("open", () => {
-        //console.log("ws connected!")
+        
     })
 
     client.on("error",(err)=>{
-        console.log(err)
-        cb({
+        
+        callback({
             error:true,
         })
     })
 
     client.on("message", (message) => {
         let msg = JSON.parse("" + message)
-        //console.log(msg)
+        
         if (msg.msg == "send_hash") {
             client.send(JSON.stringify(hash))
         } else if (msg.msg == "send_data") {
             let data = {
-                data: [prompt,"",9],
-                ...hash
+                data: userData,
+                ...hash,
+                ...opts
             }
             client.send(JSON.stringify(data))
         } else if (msg.msg == "process_completed") {
             clearTimeout(tmr)
             try{
-                const results = msg.output.data[0]
-                cb({
+                const results = msg.output.data
+                callback({
                     error:false,
                     results
                 })
             }catch(e){
-                cb({
+                callback({
                     error:true,
                 })
             }
             
         }else if(msg.msg == "queue_full"){
             if(tryCount <= 0){
-                cb({
+                callback({
                     error:true,
                 })
             }else{
                 setTimeout(()=>{
-                    generate(prompt,cb,tryCount-1)
+                    request(userData,callback,opts,tryCount-1)
                 },5000)
             }
         }
@@ -77,5 +76,5 @@ function generate(prompt, cb, tryCount=5) {
 }
 
 export default {
-    generate
+    request
 }
