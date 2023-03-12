@@ -1,6 +1,6 @@
 import { EmbedBuilder, AttachmentBuilder } from 'discord.js'
 
-import stableDiffusion from '../stablediffusion/stableDiffusion.js';
+import stableDiffusion from '../huggingface/stablediffusion/stableDiffusion.js';
 
 export const MAX_RESPONSE_CHUNK_LENGTH = 1500
 
@@ -60,7 +60,7 @@ export function createEmbedsForImageCommand(user, prompt, images) {
 
         let data = image.split(",")[1]
         const buffer = Buffer.from(data, "base64")
-        
+
         let attachment = new AttachmentBuilder(buffer, { name: `result${i}.jpg` })
         embed.setImage(`attachment://result${i}.jpg`)
 
@@ -73,6 +73,28 @@ export function createEmbedsForImageCommand(user, prompt, images) {
         files
     }
 
+}
+
+export function createEmbedForRemixCommand(user, userRemix, prompt, image) {
+
+    if (prompt.length >= 250) {
+        prompt = prompt.slice(0, 250) + "..."
+    }
+
+    const embed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setAuthor({ name: `${user.username} remixed ${userRemix.username}` })
+        .setTitle(prompt)
+    
+    let data = image.split(",")[1]
+    const buffer = Buffer.from(data, "base64")
+    let attachment = new AttachmentBuilder(buffer, { name: "result0.jpg" })
+    embed.setImage("attachment://result0.jpg")
+
+    return {
+        embeds:[embed],
+        files:[attachment]
+    }
 }
 
 export async function splitAndSendResponse(resp, user) {
@@ -97,7 +119,7 @@ export async function generateInteractionReply(interaction, user, question, cont
     if (process.env.USE_EMBED.toLowerCase() == "true") {
         //embed
         const embed = createEmbedForAskCommand(user, question, content)
-        await interaction.editReply({ embeds: [embed] }).catch(()=>{})
+        await interaction.editReply({ embeds: [embed] }).catch(() => { })
         let stableDiffusionPrompt = content.slice(0, Math.min(content.length, 200))
         stableDiffusion.generate(stableDiffusionPrompt, async (result) => {
             const results = result.results
@@ -108,15 +130,15 @@ export async function generateInteractionReply(interaction, user, question, cont
             const buffer = Buffer.from(data, "base64")
             let attachment = new AttachmentBuilder(buffer, { name: "result0.jpg" })
             embed.setImage("attachment://result0.jpg")
-            await interaction.editReply({ embeds: [embed], files: [attachment] }).catch(()=>{})
+            await interaction.editReply({ embeds: [embed], files: [attachment] }).catch(() => { })
         })
     } else {
         //normal message
         if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
             const attachment = new AttachmentBuilder(Buffer.from(content, 'utf-8'), { name: 'response.txt' });
-            await interaction.editReply({ files: [attachment] }).catch(()=>{})
+            await interaction.editReply({ files: [attachment] }).catch(() => { })
         } else {
-            await interaction.editReply({ content }).catch(()=>{})
+            await interaction.editReply({ content }).catch(() => { })
         }
     }
 }

@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { Client, GatewayIntentBits, Partials, ChannelType } from 'discord.js'
 import { initChatGPT, askQuestion } from './chatgpt/chatgpt.js'
-import { initDiscordCommands, handle_interaction_ask, handle_interaction_image } from './discord/discord_commands.js'
+import { initDiscordCommands, handle_interaction_ask, handle_interaction_image, handle_interaction_remix } from './discord/discord_commands.js'
 import { splitAndSendResponse, MAX_RESPONSE_CHUNK_LENGTH } from './discord/discord_helpers.js'
 import Conversations from './chatgpt/conversations.js'
 
@@ -20,7 +20,7 @@ async function main() {
             GatewayIntentBits.GuildIntegrations,
             GatewayIntentBits.DirectMessages,
             GatewayIntentBits.DirectMessageTyping,
-            GatewayIntentBits.MessageContent,
+            GatewayIntentBits.MessageContent
         ],
         partials: [Partials.Channel]
     });
@@ -71,6 +71,9 @@ async function main() {
                 break;
             case "image":
                 handle_interaction_image(interaction)
+                break
+            case "remix":
+                handle_interaction_remix(interaction,client)
                 break
         }
     });
