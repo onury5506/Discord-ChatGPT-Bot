@@ -67,7 +67,7 @@ function request(API_URL,userData, callback,opts={}, tryCount=5) {
                 })
             }else{
                 setTimeout(()=>{
-                    request(userData,callback,opts,tryCount-1)
+                    request(API_URL,userData,callback,opts,tryCount-1)
                 },5000)
             }
         }
