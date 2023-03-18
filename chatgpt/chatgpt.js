@@ -1,5 +1,6 @@
-import { ChatGPTUnofficialProxyAPI  } from 'chatgpt'
+import { ChatGPTUnofficialProxyAPI } from 'chatgpt'
 import { getAccessToken } from './access_token.js'
+import Moderations from './moderations.js'
 
 const chatGPT = {
     init: false,
@@ -7,7 +8,7 @@ const chatGPT = {
 }
 
 export async function initChatGPT() {
-    const api = new ChatGPTUnofficialProxyAPI ({
+    const api = new ChatGPTUnofficialProxyAPI({
         accessToken: await getAccessToken(),
         apiReverseProxyUrl: process.env.API_REVERSE_PROXY_SERVER
     })
@@ -23,13 +24,24 @@ export async function initChatGPT() {
 
     chatGPT.init = true
 
-    setTimeout(initChatGPT,1000*60*60*8) // reinir after 8 hours
+    setTimeout(initChatGPT, 1000 * 60 * 60 * 8) // reinit after 8 hours
 }
 
 export async function askQuestion(question, cb, opts = {}) {
 
     if (!chatGPT.init) {
         cb("Chatgpt not initialized!")
+        return;
+    }
+
+    try {
+        let redFlag = await Moderations(question)
+        if (redFlag) {
+            cb("Your prompt contains harmful content!")
+            return;
+        }
+    } catch (e) {
+        cb(e)
         return;
     }
 
@@ -43,7 +55,7 @@ export async function askQuestion(question, cb, opts = {}) {
         question = process.env.CONVERSATION_START_PROMPT + "\n\n" + question
     }
 
-    try{
+    try {
         const response = await chatGPT.sendMessage(question, {
             conversationId: conversationInfo.conversationId,
             parentMessageId: conversationInfo.parentMessageId
@@ -51,10 +63,10 @@ export async function askQuestion(question, cb, opts = {}) {
         conversationInfo.conversationId = response.conversationId
         conversationInfo.parentMessageId = response.parentMessageId
         cb(response.text)
-    }catch(e){
+    } catch (e) {
         cb("Oppss, something went wrong! (Error)")
         console.error("dm error : " + e)
-    }finally{
+    } finally {
         clearTimeout(tmr)
     }
 }

@@ -17,7 +17,7 @@ It uses reverse proxy now, known reverse proxies run by community members includ
 details : https://github.com/transitive-bullshit/chatgpt-api/blob/main/readme.md#reverse-proxy
 | Reverse Proxy URL                                | Author                                       | Rate Limits      | Last Checked |
 | ------------------------------------------------ | -------------------------------------------- | ---------------- | ------------ |
-| `https://chat.duti.tech/api/conversation`        | [@acheong08](https://github.com/acheong08)   | 40 req/min by IP | 2/19/2023    |
+| `https://bypass.duti.tech/api/conversation`        | [@acheong08](https://github.com/acheong08)   | 	5 req / 10 seconds by IP | 3/11/2023    |
 | `https://gpt.pawan.krd/backend-api/conversation` | [@PawanOsman](https://github.com/PawanOsman) | ?                | 2/19/2023    |
 
 ## [You can test it on discord](https://discord.gg/xggt6w6Sz4)
