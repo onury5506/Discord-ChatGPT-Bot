@@ -11,15 +11,15 @@ chatGPT.sendMessage = async function (prompt) {
 
     const tokens = tokenCount(prompt)
 
-    if(tokens > MAX_TOKENS/2){
-        return `Please limit your prompt to a maximum of ${parseInt(MAX_TOKENS/2)} tokens. Thank you.`
+    if (tokens > MAX_TOKENS / 2) {
+        return `Please limit your prompt to a maximum of ${parseInt(MAX_TOKENS / 2)} tokens. Thank you.`
     }
 
     const messages = [
         {
             role: "system",
             content: process.env.CONVERSATION_START_PROMPT.toLowerCase() != "false" ?
-                conversationInfo.newConversation :
+                process.env.CONVERSATION_START_PROMPT.toLowerCase() :
                 "You are helpful assistant"
         },
         {
@@ -31,7 +31,7 @@ chatGPT.sendMessage = async function (prompt) {
     const data = {
         model: process.env.OPENAI_MODEL,
         messages,
-        max_tokens: MAX_TOKENS-tokens
+        max_tokens: MAX_TOKENS - tokens
     }
 
     let res = await fetch("https://api.openai.com/v1/chat/completions",
@@ -44,10 +44,10 @@ chatGPT.sendMessage = async function (prompt) {
             body: JSON.stringify(data)
         })
     res = await res.json()
-    
+
     return {
-        text:res.choices[0].message.content.trim(),
-        usage:res.usage,
+        text: res.choices[0].message.content.trim(),
+        usage: res.usage,
         tokens
     }
 }
@@ -66,8 +66,8 @@ export async function askQuestion(question, cb, opts = {}) {
 
     try {
         const response = await chatGPT.sendMessage(question)
-        
-        if(!response.text){
+
+        if (!response.text) {
             throw "no response!"
         }
         cb(response.text)
