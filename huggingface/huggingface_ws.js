@@ -21,7 +21,7 @@ function request(API_URL,userData, callback,opts={}, tryCount=5) {
         callback({
             error: true
         })
-    }, 120000);
+    }, 10 * 60 * 1000);
 
     client.on("open", () => {
         
