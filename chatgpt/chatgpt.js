@@ -1,39 +1,58 @@
-import { ChatGPTUnofficialProxyAPI } from 'chatgpt'
-import { getAccessToken } from './access_token.js'
 import Moderations from './moderations.js'
+import tokenCount from './tokenCount.js'
+
+const MAX_TOKENS = parseInt(process.env.CONVERSATION_START_PROMPT) ? parseInt(process.env.CONVERSATION_START_PROMPT) : 1000
 
 const chatGPT = {
-    init: false,
     sendMessage: null,
 }
 
-export async function initChatGPT() {
-    const api = new ChatGPTUnofficialProxyAPI({
-        accessToken: await getAccessToken(),
-        apiReverseProxyUrl: process.env.API_REVERSE_PROXY_SERVER
-    })
+chatGPT.sendMessage = async function (prompt) {
 
-    chatGPT.sendMessage = async (message, opts = {}) => {
-        let result = await api.sendMessage(message, {
-            ...opts
-        })
+    const tokens = tokenCount(prompt)
 
-        result.parentMessageId = result.id
-        return result
+    if(tokens > MAX_TOKENS/2){
+        return `Please limit your prompt to a maximum of ${parseInt(MAX_TOKENS/2)} tokens. Thank you.`
     }
 
-    chatGPT.init = true
+    const messages = [
+        {
+            role: "system",
+            content: process.env.CONVERSATION_START_PROMPT.toLowerCase() != "false" ?
+                conversationInfo.newConversation :
+                "You are helpful assistant"
+        },
+        {
+            role: "user",
+            content: prompt
+        }
+    ]
 
-    setTimeout(initChatGPT, 1000 * 60 * 60 * 8) // reinit after 8 hours
+    const data = {
+        model: process.env.OPENAI_MODEL,
+        messages,
+        max_tokens: MAX_TOKENS-tokens
+    }
+
+    let res = await fetch("https://api.openai.com/v1/chat/completions",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+            },
+            body: JSON.stringify(data)
+        })
+    res = await res.json()
+    
+    return {
+        text:res.choices[0].message.content.trim(),
+        usage:res.usage,
+        tokens
+    }
 }
 
 export async function askQuestion(question, cb, opts = {}) {
-
-    if (!chatGPT.init) {
-        cb("Chatgpt not initialized!")
-        return;
-    }
-
     try {
         let redFlag = await Moderations(question)
         if (redFlag) {
@@ -45,28 +64,15 @@ export async function askQuestion(question, cb, opts = {}) {
         return;
     }
 
-    const { conversationInfo } = opts
-
-    let tmr = setTimeout(() => {
-        cb("Oppss, something went wrong! (Timeout)")
-    }, 120000)
-
-    if (process.env.CONVERSATION_START_PROMPT.toLowerCase() != "false" && conversationInfo.newConversation) {
-        question = process.env.CONVERSATION_START_PROMPT + "\n\n" + question
-    }
-
     try {
-        const response = await chatGPT.sendMessage(question, {
-            conversationId: conversationInfo.conversationId,
-            parentMessageId: conversationInfo.parentMessageId
-        })
-        conversationInfo.conversationId = response.conversationId
-        conversationInfo.parentMessageId = response.parentMessageId
+        const response = await chatGPT.sendMessage(question)
+        
+        if(!response.text){
+            throw "no response!"
+        }
         cb(response.text)
     } catch (e) {
         cb("Oppss, something went wrong! (Error)")
-        console.error("dm error : " + e)
-    } finally {
-        clearTimeout(tmr)
+        console.error("chat error : " + e)
     }
 }

@@ -1,8 +1,7 @@
-import { REST, Routes, AttachmentBuilder } from 'discord.js'
+import { REST, Routes } from 'discord.js'
 
 import stableDiffusion from '../huggingface/stablediffusion/stableDiffusion.js';
 import instructPix2pix from '../huggingface/instruct-pix2pix/instruct-pix2pix.js';
-import Conversations from '../chatgpt/conversations.js'
 import { askQuestion } from '../chatgpt/chatgpt.js';
 import { generateInteractionReply, createEmbedsForImageCommand, createEmbedForRemixCommand } from './discord_helpers.js';
 
@@ -67,18 +66,13 @@ export async function handle_interaction_ask(interaction) {
     const user = interaction.user
 
     // Begin conversation
-    let conversationInfo = Conversations.getConversation(user.id)
     const question = interaction.options.getString("question")
     await interaction.deferReply()
-    if (question.toLowerCase() == "reset") {
-        generateInteractionReply(interaction, user, question, "Who are you ?")
-        return;
-    }
 
     try {
         askQuestion(question, async (content) => {
             generateInteractionReply(interaction, user, question, content)
-        }, { conversationInfo })
+        })
     } catch (e) {
         console.error(e)
     }

@@ -1,7 +1,9 @@
 
 # Discord ChatGpt Bot
 
-In this project I used [DiscordJs](https://github.com/discordjs/discord.js) and [chatgpt](https://github.com/transitive-bullshit/chatgpt-api).
+The bot now uses the official ChatGpt API. :tada: This means you can expect more reliable and consistent responses from the bot.
+However, if you prefer to use the unofficial API version, you can always find it on the "non_official_api" branch.
+Thank you for using our bot and contributing to the project!
 
 commands :
 
@@ -9,20 +11,7 @@ commands :
 * You can generate images with ```/image 'prompt'```
 * You can edit other members' pp with ```/remix @mentionuser prompt```
 
-**Now it can continue conversation in direct messages! :tada:**
-
-You can restart conversation by sending "restart" message to bot.
-
-It uses reverse proxy now, known reverse proxies run by community members include:
-details : https://github.com/transitive-bullshit/chatgpt-api/blob/main/readme.md#reverse-proxy
-| Reverse Proxy URL                                | Author                                       | Rate Limits      | Last Checked |
-| ------------------------------------------------ | -------------------------------------------- | ---------------- | ------------ |
-| `https://bypass.duti.tech/api/conversation`        | [@acheong08](https://github.com/acheong08)   | 	5 req / 10 seconds by IP | 3/11/2023    |
-| `https://gpt.pawan.krd/backend-api/conversation` | [@PawanOsman](https://github.com/PawanOsman) | ?                | 2/19/2023    |
-
 ## [You can test it on discord](https://discord.gg/xggt6w6Sz4)
-
-  
 
 Screenshots :
 

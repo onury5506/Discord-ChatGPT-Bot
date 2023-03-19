@@ -1,16 +1,10 @@
 import 'dotenv/config'
 import { Client, GatewayIntentBits, Partials, ChannelType } from 'discord.js'
-import { initChatGPT, askQuestion } from './chatgpt/chatgpt.js'
+import { askQuestion } from './chatgpt/chatgpt.js'
 import { initDiscordCommands, handle_interaction_ask, handle_interaction_image, handle_interaction_remix } from './discord/discord_commands.js'
 import { splitAndSendResponse, MAX_RESPONSE_CHUNK_LENGTH } from './discord/discord_helpers.js'
-import Conversations from './chatgpt/conversations.js'
 
 async function main() {
-    await initChatGPT().catch(e => {
-        console.error(e)
-        process.exit()
-    })
-
     await initDiscordCommands()
 
     const client = new Client({
@@ -43,13 +37,6 @@ async function main() {
         console.log("Message : " + message.content)
         console.log("--------------")
 
-        if (message.content.toLowerCase() == "reset") {
-            Conversations.resetConversation(user.id)
-            user.send("Who are you ?")
-            return;
-        }
-
-        let conversationInfo = Conversations.getConversation(user.id)
         try {
             let sentMessage = await user.send("Hmm, let me think...")
             askQuestion(message.content, async (response) => {
@@ -58,7 +45,7 @@ async function main() {
                 } else {
                     await sentMessage.edit(response)
                 }
-            }, { conversationInfo })
+            })
         } catch (e) {
             console.error(e)
         }
