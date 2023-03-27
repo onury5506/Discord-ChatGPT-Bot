@@ -15,7 +15,22 @@ export const commands = [
                 description: "Your question",
                 type: 3,
                 required: true
-            }
+            },
+            {
+                name: "image",
+                description: "Generate an image ?",
+                type: 3,
+                choices: [
+                {
+                    name: "Yes",
+                    "value": "true"
+                },
+                {
+                    name: "No",
+                    value: "false"
+                }
+            ]
+        }
         ]
     },
     {
