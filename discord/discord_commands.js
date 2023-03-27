@@ -23,7 +23,7 @@ export const commands = [
                 choices: [
                 {
                     name: "Yes",
-                    "value": "true"
+                    value: "true"
                 },
                 {
                     name: "No",
@@ -82,11 +82,12 @@ export async function handle_interaction_ask(interaction) {
 
     // Begin conversation
     const question = interaction.options.getString("question")
+    const generateImage = interaction.options.getString("image") == "true" ? true : false;
     await interaction.deferReply()
 
     try {
         askQuestion(question, async (content) => {
-            generateInteractionReply(interaction, user, question, content)
+            generateInteractionReply(interaction, user, question, generateImage, content)
         })
     } catch (e) {
         console.error(e)
