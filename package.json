@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "nodemonConfig": {
+    "ignore": ["configFile/config.json"]
+  },
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js"

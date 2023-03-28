@@ -1,5 +1,7 @@
 import 'dotenv/config'
 import { Client, GatewayIntentBits, Partials, ChannelType } from 'discord.js'
+
+import config from './config/config.js'
 import { askQuestion } from './chatgpt/chatgpt.js'
 import { initDiscordCommands, handle_interaction_ask, handle_interaction_image, handle_interaction_remix } from './discord/discord_commands.js'
 import { splitAndSendResponse, MAX_RESPONSE_CHUNK_LENGTH } from './discord/discord_helpers.js'
@@ -25,7 +27,7 @@ async function main() {
     });
 
     client.on("messageCreate", async message => {
-        if (process.env.ENABLE_DIRECT_MESSAGES !== "true" || message.channel.type != ChannelType.DM || message.author.bot) {
+        if (config.get("ENABLE_DIRECT_MESSAGES") !== "true" || message.channel.type != ChannelType.DM || message.author.bot) {
             return;
         }
         const user = message.author

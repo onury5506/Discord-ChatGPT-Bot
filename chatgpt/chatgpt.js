@@ -1,7 +1,6 @@
+import config from '../config/config.js'
 import Moderations from './moderations.js'
 import tokenCount from './tokenCount.js'
-
-const MAX_TOKENS = parseInt(process.env.CONVERSATION_START_PROMPT) ? parseInt(process.env.CONVERSATION_START_PROMPT) : 1000
 
 const chatGPT = {
     sendMessage: null,
@@ -10,6 +9,7 @@ const chatGPT = {
 chatGPT.sendMessage = async function (prompt) {
 
     const tokens = tokenCount(prompt)
+    const MAX_TOKENS = config.get("MAX_TOKEN")
 
     if (tokens > MAX_TOKENS / 2) {
         return `Please limit your prompt to a maximum of ${parseInt(MAX_TOKENS / 2)} tokens. Thank you.`
@@ -18,8 +18,8 @@ chatGPT.sendMessage = async function (prompt) {
     const messages = [
         {
             role: "system",
-            content: process.env.CONVERSATION_START_PROMPT.toLowerCase() != "false" ?
-                process.env.CONVERSATION_START_PROMPT.toLowerCase() :
+            content: config.get("CONVERSATION_START_PROMPT") != "" ?
+                config.get("CONVERSATION_START_PROMPT") :
                 "You are helpful assistant"
         },
         {
@@ -29,7 +29,7 @@ chatGPT.sendMessage = async function (prompt) {
     ]
 
     const data = {
-        model: process.env.OPENAI_MODEL,
+        model: config.get("OPENAI_MODEL"),
         messages,
         max_tokens: MAX_TOKENS - tokens
     }
@@ -60,6 +60,7 @@ export async function askQuestion(question, cb, opts = {}) {
             return;
         }
     } catch (e) {
+        console.log(e)
         cb(e)
         return;
     }

@@ -1,6 +1,7 @@
 import { EmbedBuilder, AttachmentBuilder } from 'discord.js'
 
 import stableDiffusion from '../huggingface/stablediffusion/stableDiffusion.js';
+import config from '../config/config.js';
 
 export const MAX_RESPONSE_CHUNK_LENGTH = 1500
 
@@ -116,7 +117,7 @@ export async function splitAndSendResponse(resp, user) {
 }
 
 export async function generateInteractionReply(interaction, user, question, content) {
-    if (process.env.USE_EMBED.toLowerCase() == "true") {
+    if (config.get("USE_EMBED")) {
         //embed
         const embed = createEmbedForAskCommand(user, question, content)
         await interaction.editReply({ embeds: [embed] }).catch(() => { })

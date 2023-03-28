@@ -1,0 +1,7 @@
+{
+    "OPENAI_MODEL":"gpt-3.5-turbo",
+    "MAX_TOKEN":1000,
+    "ENABLE_DIRECT_MESSAGES":false,
+    "CONVERSATION_START_PROMPT":"",
+    "USE_EMBED":true
+}
