@@ -44,6 +44,9 @@ chatGPT.sendMessage = async function (prompt) {
             body: JSON.stringify(data)
         })
     res = await res.json()
+    if(res.error){
+        console.error(res)
+    }
 
     return {
         text: res.choices[0].message.content.trim(),

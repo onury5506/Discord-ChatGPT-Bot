@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Discord Bot</title>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js" defer></script>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+
+<body>
+    <div id="navbar">
+        <img src="/images/logo.png" />
+        <h1>Discord ChatGPT Bot</h1>
+        <a href="/logout">
+            <button>Logout</button>
+        </a>
+        <a href="https://github.com/onury5506/Discord-ChatGPT-Bot" target="_blank">
+            <img src="/images/github.png" />
+        </a>
+    </div>
+    <div id="configlist">
+        <a target="_blank" id="oauth_discord"></a>
+        <div class="config">
+            <label for="OPENAI_MODEL">OPENAI_MODEL</label>
+            <span>Which OPENAI model does the bot use?</span>
+            <input name="OPENAI_MODEL" list="OPENAI_MODELS" id="OPENAI_MODEL" />
+            <datalist id="OPENAI_MODELS">
+                <option value="gpt-3.5-turbo">
+                <option value="gpt-3.5-turbo-0301">
+                <option value="gpt-4">
+                <option value="gpt-4-0314">
+                <option value="gpt-4-32k">
+                <option value="gpt-4-32k-0314">
+            </datalist>
+        </div>
+        <div class="config">
+            <label for="MAX_TOKEN">MAX_TOKEN</label>
+            <span>What is the maximum number of tokens allowed for a prompt?</span>
+            <input name="MAX_TOKEN" id="MAX_TOKEN" type="number" />
+        </div>
+        <div class="config">
+            <label for="ENABLE_DIRECT_MESSAGES">ENABLE_DIRECT_MESSAGES</label>
+            <span>Is it possible for users to send direct messages to the bot?</span>
+            <input name="ENABLE_DIRECT_MESSAGES" id="ENABLE_DIRECT_MESSAGES" type="checkbox" />
+        </div>
+        <div class="config">
+            <label for="CONVERSATION_START_PROMPT">CONVERSATION_START_PROMPT</label>
+            <span>What is the maximum number of tokens allowed for a prompt?</span>
+            <input name="CONVERSATION_START_PROMPT" id="CONVERSATION_START_PROMPT"
+                placeholder="You are helpful assistant" />
+        </div>
+        <div class="config">
+            <label for="USE_EMBED">USE_EMBED</label>
+            <span>Generate embed for "/ask" answers.</span>
+            <input name="USE_EMBED" id="USE_EMBED" type="checkbox" />
+        </div>
+        <button id="save_button">SAVE</button>
+    </div>
+</body>
+
+</html>

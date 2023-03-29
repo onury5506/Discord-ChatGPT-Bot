@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Discord Bot</title>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/index.js" defer></script>
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+
+<body>
+    <form method="post" action="/api/login" id="loginform">
+        <img src="images/logo.png"/>
+        <div class="field">
+            <label for="username">Username</label>
+            <input id="username" name="username" />
+        </div>
+        <div class="field">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" />
+        </div>
+        <button type="submit">LOGIN</button>
+    </form>
+</body>
+
+</html>

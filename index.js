@@ -5,9 +5,11 @@ import config from './config/config.js'
 import { askQuestion } from './chatgpt/chatgpt.js'
 import { initDiscordCommands, handle_interaction_ask, handle_interaction_image, handle_interaction_remix } from './discord/discord_commands.js'
 import { splitAndSendResponse, MAX_RESPONSE_CHUNK_LENGTH } from './discord/discord_helpers.js'
+import { initDashboard } from './dashboard/dasboard.js'
 
 async function main() {
     await initDiscordCommands()
+    initDashboard()
 
     const client = new Client({
         intents: [

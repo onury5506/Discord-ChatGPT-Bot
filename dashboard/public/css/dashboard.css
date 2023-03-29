@@ -1,0 +1,72 @@
+body{
+    margin: 0;
+    padding: 0;
+    background: black;
+    color: white;
+}
+
+#navbar{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(3px);
+}
+
+#navbar img{
+    height: 80px;
+    cursor: pointer;
+}
+
+#configlist{
+    max-width: 1000px;
+    margin: auto;
+}
+
+.config{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid white;
+}
+
+.config label{
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.config span{
+    font-size: 20px;
+    color: #dddddd;
+}
+
+.config input[type=checkbox]{
+    width: 30px;
+    height: 30px;
+    margin: auto;
+}
+a{
+    text-decoration: none;
+}
+button{
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 20px;
+}
+
+#save_button{
+    display: block;
+    margin: auto;
+}
+
+#oauth_discord{
+    display: block;
+    color: white;
+    font-size: 20px;
+    margin: 20px 0;
+}

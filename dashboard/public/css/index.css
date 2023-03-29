@@ -1,0 +1,47 @@
+body{
+    margin: 0;
+    padding: 0;
+    display: block;
+    background-color: black;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#loginform{
+    border: 1px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 450px;
+    height: 450px;
+    gap: 30px;
+    font-size: 24px;
+}
+
+#loginform input{
+    font-size: 24px;
+    width: 60%;
+}
+
+#loginform label{
+    display: inline-block;
+    font-size: 24px;
+    width: 30%;
+}
+
+.field{
+    text-align: center;
+}
+
+#loginform img{
+    height: 100px;
+}
+
+#loginform button{
+    font-size: 20px;
+    padding: 3px 20px;
+}

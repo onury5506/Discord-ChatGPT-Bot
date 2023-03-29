@@ -5,6 +5,8 @@ The bot now uses the official ChatGpt API. :tada: This means you can expect more
 However, if you prefer to use the unofficial API version, you can always find it on the "non_official_api" branch.
 Thank you for using our bot and contributing to the project!
 
+We now have a convenient dashboard for configuring the bot, eliminating the need to restart it to modify settings. The bot runs on port 8080. Additionally, there are plans to integrate usage statistics into the dashboard.
+
 commands :
 
 * You can ask anything with ```/ask 'question'```
@@ -14,6 +16,8 @@ commands :
 ## [You can test it on discord](https://discord.gg/xggt6w6Sz4)
 
 Screenshots :
+
+![Screenshot_6](https://raw.githubusercontent.com/onury5506/Discord-ChatGPT-Bot/master/screen_shot/Screenshot_5.jpg)
 
 ![Screenshot_1](https://raw.githubusercontent.com/onury5506/Discord-ChatGPT-Bot/master/screen_shot/Screenshot_1.jpg)
 
@@ -50,6 +54,6 @@ npm start
 
 docker build -t discordchatgpt .
 
-docker run discordchatgpt
+docker run -p 8080:8080 -v discordchatgptconfig:/discordChatGpt/configFile discordchatgpt
 
 ```

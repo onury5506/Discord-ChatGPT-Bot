@@ -15,6 +15,10 @@ function get(key){
 }
 
 function set(key,value){
+    if(config[key] == undefined){
+        console.log("Invalid config key : ",key)
+        return;
+    }
     config[key] = value
 }
 
@@ -27,7 +31,6 @@ function save(){
 }
 
 function load(){
-    
     fs.readFile(PATH).then((data)=>{
         try{
             data = data.toString()
@@ -41,9 +44,14 @@ function load(){
     })
 }
 
+function getFullConfig(){
+    return {...config}
+}
+
 export default {
     save,
     load,
     set,
-    get
+    get,
+    getFullConfig
 }
