@@ -116,11 +116,12 @@ export async function splitAndSendResponse(resp, user) {
     }
 }
 
-export async function generateInteractionReply(interaction, user, question, content) {
+export async function generateInteractionReply(interaction, user, question, generateImage, content) {
     if (config.get("USE_EMBED")) {
         //embed
         const embed = createEmbedForAskCommand(user, question, content)
         await interaction.editReply({ embeds: [embed] }).catch(() => { })
+        if(generateImage) {
         let stableDiffusionPrompt = content.slice(0, Math.min(content.length, 200))
         stableDiffusion.generate(stableDiffusionPrompt, async (result) => {
             const results = result.results
@@ -133,6 +134,7 @@ export async function generateInteractionReply(interaction, user, question, cont
             embed.setImage("attachment://result0.jpg")
             await interaction.editReply({ embeds: [embed], files: [attachment] }).catch(() => { })
         })
+       }
     } else {
         //normal message
         if (content.length >= MAX_RESPONSE_CHUNK_LENGTH) {
