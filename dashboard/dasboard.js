@@ -19,7 +19,7 @@ function generateSecret(){
     for(let i=0;i<32;i++){
         secret += chars[Math.floor(Math.random()*chars.length)]
     }
-    return "secret" //secret
+    return secret
 }
 
 app.use("/api",API_ROUTER)
