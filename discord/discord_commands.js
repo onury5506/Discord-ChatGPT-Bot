@@ -15,7 +15,22 @@ export const commands = [
                 description: "Your question",
                 type: 3,
                 required: true
-            }
+            },
+            {
+                name: "image",
+                description: "Generate an image ?",
+                type: 3,
+                choices: [
+                {
+                    name: "Yes",
+                    value: "true"
+                },
+                {
+                    name: "No",
+                    value: "false"
+                }
+            ]
+        }
         ]
     },
     {
@@ -67,11 +82,12 @@ export async function handle_interaction_ask(interaction) {
 
     // Begin conversation
     const question = interaction.options.getString("question")
+    const generateImage = interaction.options.getString("image") == "true" ? true : false;
     await interaction.deferReply()
 
     try {
         askQuestion(question, async (content) => {
-            generateInteractionReply(interaction, user, question, content)
+            generateInteractionReply(interaction, user, question, generateImage, content)
         })
     } catch (e) {
         console.error(e)
