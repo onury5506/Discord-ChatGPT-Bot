@@ -17,7 +17,7 @@ commands :
 
 Screenshots :
 
-![Screenshot_6](https://raw.githubusercontent.com/onury5506/Discord-ChatGPT-Bot/master/screen_shot/Screenshot_5.jpg)
+![Screenshot_6](https://raw.githubusercontent.com/onury5506/Discord-ChatGPT-Bot/master/screen_shot/Screenshot_6.jpg)
 
 ![Screenshot_1](https://raw.githubusercontent.com/onury5506/Discord-ChatGPT-Bot/master/screen_shot/Screenshot_1.jpg)
 
