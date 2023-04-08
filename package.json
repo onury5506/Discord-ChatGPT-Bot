@@ -1,6 +1,6 @@
 {
   "name": "chatgpt-discordjs",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -18,12 +18,16 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",
+    "cheerio": "^1.0.0-rc.12",
     "cookie-parser": "^1.4.6",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "gpt-3-encoder": "^1.1.4",
+    "https-proxy-agent": "^5.0.1",
     "jsonwebtoken": "^9.0.0",
+    "node-fetch": "^3.3.1",
+    "proxy-check": "^1.0.8",
     "ws": "^8.11.0"
   },
   "devDependencies": {

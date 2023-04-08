@@ -5,6 +5,10 @@ const fields = {
     CONVERSATION_START_PROMPT: document.getElementById("CONVERSATION_START_PROMPT"),
     USE_EMBED: document.getElementById("USE_EMBED"),
 }
+const Success = document.getElementById("notiSuccess");
+const Failure = document.getElementById("notiFail");
+
+
 
 document.getElementById("save_button").addEventListener("click",saveConfig)
 
@@ -21,7 +25,6 @@ async function getOAuthUrl(){
     console.log(res)
     const a = document.getElementById("oauth_discord")
     a.href = res.url
-    a.innerText = res.url
 }
 getOAuthUrl()
 
@@ -38,7 +41,7 @@ async function loadConfig() {
 
     fields.OPENAI_MODEL.value = res.OPENAI_MODEL
     fields.MAX_TOKEN.value = res.MAX_TOKEN
-    fields.ENABLE_DIRECT_MESSAGES.checked = res.OPENAI_MODEL
+    fields.ENABLE_DIRECT_MESSAGES.checked = res.ENABLE_DIRECT_MESSAGES
     fields.CONVERSATION_START_PROMPT.value = res.CONVERSATION_START_PROMPT
     fields.USE_EMBED.checked = res.USE_EMBED
 }
@@ -68,11 +71,23 @@ async function saveConfig() {
     })
 
     if(res.status != 200){
-        alert("Something went wrong!")
+        // Show the notification
+        Failure.style.display = "block";
+
+        // Hide the notification after some time (optional)
+        setTimeout(() => {
+          Failure.style.display = "none";
+        }, 5000); // Hide after 5 seconds
         return;
     }
     await loadConfig()
-    alert("Config saved")
+        // Show the notification
+        Success.style.display = "block";
+
+        // Hide the notification after some time (optional)
+        setTimeout(() => {
+          Success.style.display = "none";
+        }, 5000); // Hide after 5 seconds
 }
 
 loadConfig()
