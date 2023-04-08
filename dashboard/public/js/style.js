@@ -1,9 +1,3 @@
-// aos.js
-AOS.init({
-    duration: 700,
-    once: true
-});
-  
 // navbar burger
 document.addEventListener('DOMContentLoaded', () => {
     const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
