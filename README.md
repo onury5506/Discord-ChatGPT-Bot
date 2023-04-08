@@ -12,6 +12,7 @@ commands :
 * You can ask anything with ```/ask 'question'```
 * You can generate images with ```/image 'prompt'```
 * You can edit other members' pp with ```/remix @mentionuser prompt```
+* You can generate videos with ```/video prompt```
 
 ## [You can test it on discord](https://discord.gg/xggt6w6Sz4)
 
