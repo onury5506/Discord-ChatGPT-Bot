@@ -3,7 +3,7 @@ import { Client, GatewayIntentBits, Partials, ChannelType } from 'discord.js'
 
 import config from './config/config.js'
 import { askQuestion } from './chatgpt/chatgpt.js'
-import { initDiscordCommands, handle_interaction_ask, handle_interaction_image, handle_interaction_remix } from './discord/discord_commands.js'
+import { initDiscordCommands, handle_interaction_ask, handle_interaction_image, handle_interaction_remix, commandExecuters } from './discord/discord_commands.js'
 import { splitAndSendResponse, MAX_RESPONSE_CHUNK_LENGTH } from './discord/discord_helpers.js'
 import { initDashboard } from './dashboard/dasboard.js'
 
@@ -56,16 +56,8 @@ async function main() {
     })
 
     client.on("interactionCreate", async interaction => {
-        switch (interaction.commandName) {
-            case "ask":
-                handle_interaction_ask(interaction)
-                break;
-            case "image":
-                handle_interaction_image(interaction)
-                break
-            case "remix":
-                handle_interaction_remix(interaction,client)
-                break
+        if(commandExecuters[interaction.commandName]){
+            commandExecuters[interaction.commandName](interaction,client)
         }
     });
 

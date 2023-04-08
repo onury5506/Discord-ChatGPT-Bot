@@ -4,6 +4,7 @@ import stableDiffusion from '../huggingface/stablediffusion/stableDiffusion.js';
 import instructPix2pix from '../huggingface/instruct-pix2pix/instruct-pix2pix.js';
 import { askQuestion } from '../chatgpt/chatgpt.js';
 import { generateInteractionReply, createEmbedsForImageCommand, createEmbedForRemixCommand } from './discord_helpers.js';
+import damoTextToVideo from '../replicate/damoTextToVideo/damoTextToVideo.js';
 
 export const commands = [
     {
@@ -21,16 +22,16 @@ export const commands = [
                 description: "Generate an image ?",
                 type: 3,
                 choices: [
-                {
-                    name: "Yes",
-                    value: "true"
-                },
-                {
-                    name: "No",
-                    value: "false"
-                }
-            ]
-        }
+                    {
+                        name: "Yes",
+                        value: "true"
+                    },
+                    {
+                        name: "No",
+                        value: "false"
+                    }
+                ]
+            }
         ]
     },
     {
@@ -55,6 +56,18 @@ export const commands = [
                 type: 3,
                 required: true
             },
+            {
+                name: "prompt",
+                description: "Your prompt",
+                type: 3,
+                required: true
+            }
+        ]
+    },
+    {
+        name: 'video',
+        description: 'Ask Anything!',
+        options: [
             {
                 name: "prompt",
                 description: "Your prompt",
@@ -141,18 +154,18 @@ export async function handle_interaction_remix(interaction, client) {
         pp_url = pp_url.split(".")
         pp_url[pp_url.length - 1] = "jpg"
         pp_url = pp_url.join(".")
-        
+
         const pp = await fetch(pp_url)
         const pp_blob = await pp.blob()
         const pp_buffer = Buffer.from(await pp_blob.arrayBuffer())
         const pp_base64 = "data:image/jpg;base64," + pp_buffer.toString("base64")
-        
+
         instructPix2pix.remix(pp_base64, prompt, async (res) => {
             if (res.error) {
                 await interaction.editReply({ content: "error..." }).catch(() => { })
                 return;
             }
-            
+
             let embed = createEmbedForRemixCommand(
                 user,
                 user_remix,
@@ -161,7 +174,7 @@ export async function handle_interaction_remix(interaction, client) {
             )
 
             await interaction.editReply({
-                content:interaction.options.getString("user"),
+                content: interaction.options.getString("user"),
                 ...embed
             }).catch(() => { })
         })
@@ -170,4 +183,37 @@ export async function handle_interaction_remix(interaction, client) {
     } catch (e) {
         console.error(e)
     }
+}
+
+export async function handle_interaction_video(interaction) {
+    const user = interaction.user
+
+    // Begin conversation
+    let prompt = interaction.options.getString("prompt")
+    prompt = prompt.slice(0, Math.max(1000, prompt.length))
+
+    try {
+        await interaction.deferReply()
+
+        let res = await damoTextToVideo(prompt)
+        if (res.error) {
+            throw res.errorMsg
+        }
+
+        await interaction.editReply({
+            content: `${user.username}\n${prompt}`,
+            files: [res.output]
+        })
+
+    } catch (e) {
+        await interaction.editReply("Something went wrong!").catch(() => { })
+        console.error(e)
+    }
+}
+
+export const commandExecuters = {
+    ask: handle_interaction_ask,
+    image: handle_interaction_image,
+    remix: handle_interaction_remix,
+    video: handle_interaction_video
 }
