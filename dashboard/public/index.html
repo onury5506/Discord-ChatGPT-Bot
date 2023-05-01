@@ -1,55 +1,117 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ChatGPT Bot Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/bulma.min.css" />
-    <link rel="stylesheet" href="./css/style.css" />
-    <link herf="https://lordicon.com/assets/css/lordicon.538b70933bfc743f5284.css" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/uni-sans-regular" rel="stylesheet">
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+        integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="/js/auth.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
 
-  </head>
+        :root {
+            --nord0: #2E3440;
+            --nord1: #3B4252;
+            --nord2: #434C5E;
+            --nord3: #4C566A;
+            --nord4: #D8DEE9;
+            --nord5: #E5E9F0;
+            --nord6: #ECEFF4;
+            --nord7: #8FBCBB;
+            --nord8: #88C0D0;
+            --nord9: #81A1C1;
+            --nord10: #5E81AC;
+            --nord11: #BF616A;
+            --nord12: #D08770;
+            --nord13: #EBCB8B;
+            --nord14: #A3BE8C;
+            --nord15: #B48EAD;
+        }
 
-  <body>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--nord0);
+            color: var(--nord4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--nord1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--nord0);
+            width: 100%;
+            margin:1rem;
+            max-width: 600px;
+
+        }
+        h1{
+            color: var(--nord4);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        img{
+            width: 2em;
+            margin-bottom: 20px;
+        }
+        input{
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: var(--nord2);
+            color: var(--nord4);
+            font-size: 1rem;
+        }
+        button{
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: var(--nord10);
+            color: var(--nord4);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        label{
+            text-align: left;
+            width: 100%;
+            margin:.2rem;
+        }
+    </style>
+</head>
+
+<body>
     <form method="post" action="/api/login" id="loginform">
-        <section class="hero is-fullheight">
-            <div class="hero-body has-text-centered"style="justify-content: center;">
-                <div class="login">
-                    <div class="has-text-centered">
-                        <h1 class="title lined">Login</h1>
-                        <div class="line line-center blurple"></div>
-                    </div><br>
-                    <img class="logo" src="./images/logo.png">
-                    <div class="field">
-                        <div class="control">
-                            <input id="username" class="input is-medium is-rounded" type="text" name="username" placeholder="username" required />
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <input id="password" class="input is-medium is-rounded" type="password" name="password" placeholder="password" required />
-                        </div>
-                    </div><br>
-                    <button class="button is-block is-fullwidth is-primary is-medium is-rounded" type="submit">
-                        <i class="fa-solid fa-right-to-bracket"></i><strong style="margin-left: 5px;">Login</strong>
-                    </button>
-                <br>
-                </div>
-            </div>
-        </section>
+        <h1>Discord ChatGPT Bot</h1>
+        <img class="logo" src="./images/logo.png">
+        <label for="username">Username</label>
+        <input id="username" type="text" name="username" placeholder="username" required />
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" placeholder="password" required />
+        <button type="submit">
+            <i class="fa-solid fa-right-to-bracket"></i><strong style="margin-left: 5px;">Login</strong>
+        </button>
     </form>
-  </body>
+</body>
 
 </html>
