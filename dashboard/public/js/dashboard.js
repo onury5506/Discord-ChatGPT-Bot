@@ -10,9 +10,9 @@ const Failure = document.getElementById("notiFail");
 
 
 
-document.getElementById("save_button").addEventListener("click",saveConfig)
+document.getElementById("save_button").addEventListener("click", saveConfig)
 
-async function getOAuthUrl(){
+async function getOAuthUrl() {
     let res = await fetch("/api/oauthurl", {
         credentials: "include"
     })
@@ -48,7 +48,7 @@ async function loadConfig() {
 
 async function saveConfig() {
     const data = {
-        OPENAI_MODEL:fields.OPENAI_MODEL.value,
+        OPENAI_MODEL: fields.OPENAI_MODEL.value,
         MAX_TOKEN: fields.MAX_TOKEN.value,
         ENABLE_DIRECT_MESSAGES: fields.ENABLE_DIRECT_MESSAGES.checked,
         CONVERSATION_START_PROMPT: fields.CONVERSATION_START_PROMPT.value,
@@ -57,7 +57,7 @@ async function saveConfig() {
 
     data.MAX_TOKEN = parseInt(data.MAX_TOKEN)
 
-    if(!data.MAX_TOKEN){
+    if (!data.MAX_TOKEN) {
         data.MAX_TOKEN = 1000
     }
 
@@ -70,24 +70,27 @@ async function saveConfig() {
         }
     })
 
-    if(res.status != 200){
+    if (res.status != 200) {
         // Show the notification
-        Failure.style.display = "block";
+        Failure.style.opacity = "1";
+        Failure.style.zIndex="1";
 
         // Hide the notification after some time (optional)
         setTimeout(() => {
-          Failure.style.display = "none";
+            Failure.style.opacity = "0";
+            Failure.style.zIndex="-1";
         }, 5000); // Hide after 5 seconds
         return;
     }
     await loadConfig()
-        // Show the notification
-        Success.style.display = "block";
-
-        // Hide the notification after some time (optional)
-        setTimeout(() => {
-          Success.style.display = "none";
-        }, 5000); // Hide after 5 seconds
+    // Show the notification
+    Success.style.opacity = "1";
+    Success.style.zIndex="1";
+    // Hide the notification after some time (optional)
+    setTimeout(() => {
+        Success.style.opacity = "0";
+        Success.style.zIndex="-1";
+    }, 5000); // Hide after 5 seconds
 }
 
 loadConfig()

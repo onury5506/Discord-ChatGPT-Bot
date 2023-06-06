@@ -1,208 +1,130 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ChatGPT Bot Dashboard</title>
-    <link rel="stylesheet" href="./css/bulma.min.css" />
-    <link rel="stylesheet" href="./css/style.css" />
-    <link herf="https://lordicon.com/assets/css/lordicon.538b70933bfc743f5284.css" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/uni-sans-regular" rel="stylesheet">
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/tippy.js@6/animations/scale.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
 
-    <script src="./js/jquery-3.6.0.js"></script>
-    <script src="/js/auth.js"></script>
-    <script src="/js/dashboard.js" defer></script>
-  </head>
-  <body>
-    <!-- Back To Top Start -->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ChatGPT Bot Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link herf="https://lordicon.com/assets/css/lordicon.538b70933bfc743f5284.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="./js/jquery-3.6.0.js"></script>
+  <script src="/js/auth.js"></script>
+</head>
+
+<body>
+  <div class="fixed">
+    <button id="save_button" class="button is-success is-outlined"><i class="fa-solid fa-floppy-disk"></i> Save</button>
     <a id="backtotop" data-tippy-content="Back To Top.">
       <i class="fa-solid fa-angle-up has-text-white fa-2xl mt-5"></i>
     </a>
-    <!-- Back To Top End -->
-
-    <!-- Navbar Start -->
-    <nav
-      class="navbar is-fixed-top"
-      role="navigation"
-      aria-label="main navigation"
-    >
-      <div class="navbar-brand mt-2 mb-2">
-        <a class="navbar-item" href="#">
-        <img
-            src="./images/logo.png"
-          />
-        </a>
-
-        <a
-          role="button"
-          class="navbar-burger has-text-white"
-          data-target="navMenu"
-          aria-label="menu"
-          aria-expanded="false"
-        >
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
-
-      <div id="navbarBasicExample" class="navbar-menu">
-
-        <div class="navbar-end">
-
-          <div class="navbar-item">
-            <div class="buttons">
-                <a href="https://github.com/onury5506/Discord-ChatGPT-Bot" class="button" target="_blank">
-                    <strong>
-                        <i class="fa-brands fa-github"></i>
-                       Github</strong>
-                </a>
-              <a href="/logout" class="button is-danger">
-                <strong
-                  ><i class="fa-solid fa-right-from-bracket"></i>
-                   Logout</strong
-                >
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-    <!-- Navbar End -->
-
-    <!-- Configuration Section Start -->
-    <section id="configlist" class="section mt-6">
-      <div class="has-text-centered">
-        <h1 class="title lined">ChatGPT Discord Bot</h1>
-        <div class="line line-center blurple"></div>
-        <br>
-        <div class="buttons is-centered">
-            <a id="oauth_discord" class="button" style="background-color: #5865F2; color: white; border: 0;" target="_blank">
-                <strong>
-                    <i class="fa-brands fa-discord"></i>
-                   Invite Bot</strong>
-            </a>
-        </div>
-      </div>
-
-
-
-        <div class="columns mt-6 is-centered">
-            <div class="column mr-6">
-                <h4 class="title is-3">OpenAI Model</h4>
-                <p class="subtitle mt-3">
-                  Choose which OPENAI model does the bot use?
-                </p>
-                <div class="control">
-                  <div class="select">
-                      <select list="OPENAI_MODELS" id="OPENAI_MODEL">
-                          <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                          <option value="gpt-3.5-turbo-0301">GPT-3.5 Turbo 0301</option>
-                          <option value="gpt-4">GPT-4</option>
-                          <option value="gpt-4-0314">GPT-4 0314</option>
-                          <option value="gpt-4-32k">GPT-4 32K</option>
-                          <option value="gpt-4-32k-0314">GPT-4 32K 0314</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="columns mt-6 is-centered">
-            <div class="column mr-6">
-                <h4 class="title is-3" for="OPENAI_MODEL">Max Token</h4>
-                <p class="subtitle mt-3">
-                  The maximum number of tokens allowed for a prompt?
-                </p>
-                <div class="control">
-                    <input class="input" name="MAX_TOKEN" id="MAX_TOKEN" type="number" min="1" max="2048" placeholder="2048">
-                </div>
-            </div>
-        </div>
-        <div class="columns mt-6 is-centered">
-            <div class="column mr-6">
-                <h4 class="title is-3" for="CONVERSATION_START_PROMPT">Conversation Start Prompt</h4>
-                <p class="subtitle mt-3">
-                  A little prompt to customize bot's responses behaviour
-                </p>
-                <div class="control">
-                    <input class="input" name="CONVERSATION_START_PROMPT" id="CONVERSATION_START_PROMPT" placeholder="You are helpful assistant">
-                </div>
-            </div>
-        </div>
-        <div class="columns mt-6 is-centered">
-            <div class="column mr-6">
-                <h4 class="title is-3" for="ENABLE_DIRECT_MESSAGES">Enable Direct Messages</h4>
-                <label class="checkbox">
-                    <p class="subtitle mt-3">
-                        Enable users to send DMs to the bot and bot respond to them
-                    </p>
-                    <input name="ENABLE_DIRECT_MESSAGES" id="ENABLE_DIRECT_MESSAGES" type="checkbox" />
-                  </label>
-            </div>
-        </div>
-        <div class="columns mt-6 is-centered">
-            <div class="column mr-6">
-                <h4 class="title is-3" for="USE_EMBED">Use Embeds</h4>
-                <label class="checkbox">
-                    <p class="subtitle mt-3">
-                        Generate /ask command answers in an Embed.
-                    </p>
-                    <input name="USE_EMBED" id="USE_EMBED" type="checkbox"/>
-                  </label>
-            </div>
-        </div>
-        <br><br>
-
-        <button id="save_button" class="button is-success is-outlined"><i class="fa-solid fa-floppy-disk"></i> <strong style="margin-left: 4px;">Save</strong></button>
-    </section>
-    <!-- Configuration Section End -->
-  
-    <!-- Footer Section Start -->
-    <footer class="footer">
-      <div class="content has-text-centered has-text-white">
-        <div class="mb-2">
-          <a href="https://discord.gg/5N9BT5eJ2g" class="has-text-white" target="_blank">
-            <i class="fa-brands fa-discord"></i>
-          </a>
-          &nbsp; &nbsp;
-          <a href="https://github.com/onury5506/Discord-ChatGPT-Bot" class="has-text-white" target="_blank">
-            <i class="fa-brands fa-github"></i>
-          </a>
-        </div>
-
-        <p>
-          <span class="has-text-weight-bold" style="font-family: 'Uni Sans Demo', sans-serif;">Discord ChatGPT Bot</span>
-          <br />
-          Copyright Onur Yildiz &copy; <span id="cp-year"></span> All rights reserved
-        </p>
-      </div>
-    </footer>
-    <!-- Footer Section End -->
-
-
-    <!-- Notifications End -->
-
-    <div id="notiSuccess" class="notification is-success" style="display:none; position:fixed; top:70px; right:10px;">
-      <button class="delete"></button>
-      <i class="fa-solid fa-circle-check fa-beat-fade"></i><strong style="margin-left: 10px;">Configuration Saved Successfully!</strong>
+  </div>
+  <nav class="navbar">
+    <a class="navbar-item" href="#">
+      <img src="./images/logo.png" />Discord ChatGPT Bot Dashboard
+    </a>
+    <div>
+      <a id="oauth_discord" class="button" target="_blank">
+        <i class="fa-brands fa-discord"></i>
+        Invite Bot
+      </a>
+      <a href="/logout" class="button is-danger">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout</a>
     </div>
-    <div id="notiFail" class="notification is-danger" style="display:none; position:fixed; top:70px; right:10px;">
-      <button class="delete"></button>
-      <i class="fa-solid fa-circle-exclamation fa-beat-fade"></i><strong style="margin-left: 10px;">Something went wrong!</strong>
-    </div>
-            
-    <!-- Notifications End -->
-    <script src="./js/style.js"></script>
-  </body>
+  </nav>
+  <!-- Navbar End -->
+
+  <!-- Configuration Section Start -->
+  <main>
+    <h1>Configuration</h1>
+    <p class="remember">
+      remember to save your changes before leaving this page.
+    </p>
+    <h2>OpenAI Model</h2>
+    <p>Choose which OPENAI model does the bot use?</p>
+    <select list="OPENAI_MODELS" id="OPENAI_MODEL">
+      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+      <option value="gpt-3.5-turbo-0301">GPT-3.5 Turbo 0301</option>
+      <option value="gpt-4">GPT-4</option>
+      <option value="gpt-4-0314">GPT-4 0314</option>
+      <option value="gpt-4-32k">GPT-4 32K</option>
+      <option value="gpt-4-32k-0314">GPT-4 32K 0314</option>
+    </select>
+    <h2 for="OPENAI_MODEL">Max Token</h2>
+    <p>
+      The maximum number of tokens allowed for a prompt?
+    </p>
+    <input class="input" id="MAX_TOKEN" type="number" min="1" max="2048" placeholder="2048">
+    <h2 for="CONVERSATION_START_PROMPT">Conversation Start Prompt</h2>
+    <p>
+      A little prompt to customize bot's responses behaviour
+    </p>
+    <input class="input" id="CONVERSATION_START_PROMPT" placeholder="You are helpful assistant">
+    <h2><input id="ENABLE_DIRECT_MESSAGES" type="checkbox" />
+      Enable Direct Messages</h2>
+    <label for="ENABLE_DIRECT_MESSAGES">
+      <p>
+        Enable users to send DMs to the bot and bot respond to them
+      </p>
+    </label>
+    <h2><input id="USE_EMBED" type="checkbox" />Use Embeds</h2>
+    <label class="checkbox" for="USE_EMBED">
+      <p>
+        Generate /ask command answers in an Embed.
+      </p>
+    </label>
+  </main>
+  <footer>
+    <div><a href="https://discord.gg/5N9BT5eJ2g" class="has-text-white" target="_blank">
+        <i class="fa-brands fa-discord"></i>
+      </a><a href="https://github.com/onury5506/Discord-ChatGPT-Bot" class="has-text-white" target="_blank">
+        <i class="fa-brands fa-github"></i>
+      </a></div>
+    Copyright Onur Yildiz &copy; <span id="cp-year"></span> All rights reserved
+  </footer>
+
+  <div id="notiSuccess" class="notification is-success">
+
+    <i class="fa-solid fa-circle-check fa-beat-fade"></i><strong>Configuration Saved
+      Successfully!</strong>
+    <button class="delete"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div id="notiFail" class="notification is-danger">
+    <i class="fa-solid fa-circle-exclamation fa-beat-fade"></i><strong>Something went
+      wrong!</strong>
+    <button class="delete"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <!-- Notifications End -->
+  <script>
+    // back to top
+    var btn = $("#backtotop");
+
+    btn.on("click", function (e) {
+      e.preventDefault();
+      $("html, body").animate({ scrollTop: 0 }, "300");
+    });
+
+    // copyright year
+    document.getElementById("cp-year").innerHTML = new Date().getFullYear()
+
+    const Succ = document.getElementById("notiSuccess");
+    const Fail = document.getElementById("notiFail");
+    const deleteButton1 = Succ.querySelector(".delete");
+    const deleteButton2 = Fail.querySelector(".delete");
+
+    deleteButton1.addEventListener("click", () => {
+      Succ.style.opacity = "0";
+      Succ.style.zIndex = "-1";
+    });
+    deleteButton2.addEventListener("click", () => {
+      Fail.style.opacity = "0";
+      Fail.style.zIndex = "-1";
+    });
+  </script>
+</body>
+
 </html>
