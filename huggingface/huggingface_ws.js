@@ -28,7 +28,7 @@ function request(API_URL,userData, callback,opts={}, tryCount=5) {
     })
 
     client.on("error",(err)=>{
-        
+        console.log(err)
         callback({
             error:true,
         })
