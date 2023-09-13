@@ -4,7 +4,6 @@ import stableDiffusion from '../huggingface/stablediffusion/stableDiffusion.js';
 import instructPix2pix from '../huggingface/instruct-pix2pix/instruct-pix2pix.js';
 import { askQuestion } from '../chatgpt/chatgpt.js';
 import { generateInteractionReply, createEmbedsForImageCommand, createEmbedForRemixCommand } from './discord_helpers.js';
-import damoTextToVideo from '../replicate/damoTextToVideo/damoTextToVideo.js';
 
 export const commands = [
     {
@@ -56,18 +55,6 @@ export const commands = [
                 type: 3,
                 required: true
             },
-            {
-                name: "prompt",
-                description: "Your prompt",
-                type: 3,
-                required: true
-            }
-        ]
-    },
-    {
-        name: 'video',
-        description: 'Ask Anything!',
-        options: [
             {
                 name: "prompt",
                 description: "Your prompt",
@@ -185,35 +172,8 @@ export async function handle_interaction_remix(interaction, client) {
     }
 }
 
-export async function handle_interaction_video(interaction) {
-    const user = interaction.user
-
-    // Begin conversation
-    let prompt = interaction.options.getString("prompt")
-    prompt = prompt.slice(0, Math.max(1000, prompt.length))
-
-    try {
-        await interaction.deferReply()
-
-        let res = await damoTextToVideo(prompt)
-        if (res.error) {
-            throw res.errorMsg
-        }
-
-        await interaction.editReply({
-            content: `${user.username}\n${prompt}`,
-            files: [res.output]
-        })
-
-    } catch (e) {
-        await interaction.editReply("Something went wrong!").catch(() => { })
-        console.error(e)
-    }
-}
-
 export const commandExecuters = {
     ask: handle_interaction_ask,
     image: handle_interaction_image,
-    remix: handle_interaction_remix,
-    video: handle_interaction_video
+    remix: handle_interaction_remix
 }
