@@ -29,7 +29,7 @@ async function main() {
     });
 
     client.on("messageCreate", async message => {
-        if (config.get("ENABLE_DIRECT_MESSAGES") !== "true" || message.channel.type != ChannelType.DM || message.author.bot) {
+        if (config.get("ENABLE_DIRECT_MESSAGES") !== true || message.channel.type != ChannelType.DM || message.author.bot) {
             return;
         }
         const user = message.author
